@@ -9,6 +9,8 @@ import genresRouter from './api/genres'
 import session from 'express-session';
 import passport from './authenticate';
 
+const optimizelyExpress = require('@optimizely/express');
+
 dotenv.config();
 
 if (process.env.SEED_DB) {
@@ -28,8 +30,23 @@ const errHandler = (err, req, res, next) => {
 const app = express();
 
 const port = process.env.PORT;
-//configure body-parser
 
+const optimizely = optimizelyExpress.initialize({
+  sdkKey: process.env.OPTIMIZELY,
+  datafileOptions: {
+    autoUpdate: true,      // Indicates feature flags will be auto-updated based on UI changes 
+    updateInterval: 1*1000 // 1 second in milliseconds
+  },
+  logLevel: 'info',        // Controls console logging. Can be 'debug', 'info', 'warn', or 'error'
+});
+
+app.use(optimizely.middleware);
+
+
+
+
+
+//configure body-parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 
@@ -39,13 +56,26 @@ app.use(session({
   resave: true,
   saveUninitialized: true
 }));
-app.use(express.static('public'));
+
 // initialise passport​
 app.use(passport.initialize());
 // Add passport.authenticate(..)  to middleware stack for protected routes​
 app.use('/api/movies', passport.authenticate('jwt', {session: false}), moviesRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/genres', genresRouter)
+
+app.get('/', function(req, res, next) {
+  const isEnabled = req.optimizely.client.isFeatureEnabled(
+    'movie_app_ca2',       // Feature key connecting feature to UI
+    'yzj',           // String ID used for random percentage-based rollout
+    {
+      customerId: 20091571,   // Attributes used for targeted audience-based rollout
+      isVip: true,
+    }
+  );
+
+  res.send('Optimizely Express Example: ' +  (isEnabled ? 'You got the hello world feature!' : 'Feature off.'))
+});
 
 app.use(errHandler);
 
