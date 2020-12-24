@@ -48,7 +48,7 @@ app.get('/', function(req, res, next) {
     }
   );
 
-  res.send('Optimizely Express Example: ' +  (isEnabled ? 'You got the hello world feature!' : 'Feature off.'))
+  res.status(200).send('Optimizely Express Example: ' +  (isEnabled ? 'You got the hello world feature!' : 'Feature off.'))
 });
 
 app.use(errHandler);
@@ -56,3 +56,5 @@ app.use(errHandler);
 app.listen(port, () => {
   console.info(`Server running at ${port}`);
 });
+
+export default app;

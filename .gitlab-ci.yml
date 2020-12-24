@@ -1,0 +1,37 @@
+image: node:latest
+
+variables:
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+  NODE_ENV: 'test'
+
+cache:
+  key:
+    files:
+      - package.json
+  paths:
+    - .npm
+    - node_modules
+
+services:
+   - mongo
+
+stages:
+  - install
+  - build
+  - test
+  - deploy
+  - production
+
+install_dependencies:
+  stage: install
+  script:
+    - npm  ci
+
+Build_api:
+  stage: build
+  before_script:
+     - npm run clean
+  script:
+    - npm run build
+
+
