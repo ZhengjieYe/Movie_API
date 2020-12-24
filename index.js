@@ -1,22 +1,11 @@
 import dotenv from 'dotenv';
 import express from 'express';
-import moviesRouter from './api/movies';
 import bodyParser from 'body-parser';
 import './db';
-import {loadUsers, loadMovies} from './seedData';
-import usersRouter from './api/users';
-import genresRouter from './api/genres'
-import session from 'express-session';
-import passport from './authenticate';
 
 const optimizelyExpress = require('@optimizely/express');
 
 dotenv.config();
-
-if (process.env.SEED_DB) {
-  loadUsers();
-  loadMovies();
-}
 
 const errHandler = (err, req, res, next) => {
   /* if the error in development then send stack trace to display whole error,
@@ -44,25 +33,10 @@ app.use(optimizely.middleware);
 
 
 
-
-
 //configure body-parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 
-//session middleware
-app.use(session({
-  secret: 'ilikecake',
-  resave: true,
-  saveUninitialized: true
-}));
-
-// initialise passport​
-app.use(passport.initialize());
-// Add passport.authenticate(..)  to middleware stack for protected routes​
-app.use('/api/movies', passport.authenticate('jwt', {session: false}), moviesRouter);
-app.use('/api/users', usersRouter);
-app.use('/api/genres', genresRouter)
 
 app.get('/', function(req, res, next) {
   const isEnabled = req.optimizely.client.isFeatureEnabled(
