@@ -2,8 +2,11 @@ import dotenv from 'dotenv';
 import express from 'express';
 import bodyParser from 'body-parser';
 import './db';
+import testRouter from './api/test'
 
 const optimizelyExpress = require('@optimizely/express');
+import swaggerJsdoc from "swagger-jsdoc"
+import swaggerUi from "swagger-ui-express"
 
 dotenv.config();
 
@@ -52,6 +55,43 @@ app.get('/', function(req, res, next) {
 });
 
 app.use(errHandler);
+
+
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "YZJ's Movie APP Express API with Swagger",
+      version: "0.1.0",
+      description:
+        "This is a Movie API application made with Express and documented with Swagger",
+      license: {
+        name: "MIT",
+        url: "https://spdx.org/licenses/MIT.html",
+      },
+      contact: {
+        name: "ZhengjieYe",
+        email: "20091571@mail.wit.ie",
+      },
+    },
+    servers: [
+      {
+        url: "http://localhost:8080/",
+      },
+    ],
+  },
+  apis: ["./api/**/index.js"],
+};
+
+const specs = swaggerJsdoc(options);
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(specs, { explorer: true })
+);
+
+
+app.use("/test/",testRouter)
 
 app.listen(port, () => {
   console.info(`Server running at ${port}`);
