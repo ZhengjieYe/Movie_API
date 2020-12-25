@@ -33,17 +33,16 @@ Build_api:
      - npm run clean
   script:
     - npm run build
-  artifacts:
-    paths:
-      - build/
 
 test_api:
   stage: test
   script:
     - npm test
 
-deploy_staging_job:
+deploy_staging_job_develop:
   stage: staging
+  only:
+    - develop
   before_script:
     - mkdir -p ~/.ssh
     - echo -e "$STAGING_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
@@ -52,9 +51,22 @@ deploy_staging_job:
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - echo -n "Deploy staging to staging server..."
-    - scp -r build ec2-user@$STAGING_DEPLOY_SERVER:/home/ec2-user
-    - ssh ec2-user@$STAGING_DEPLOY_SERVER 'rm -rf CICD_CA2/ && mv build/ CICD_CA2/'
+    - ssh ec2-user@$STAGING_DEPLOY_SERVER 'cd Movie_API/ && git pull gitlab develop && npm ci && npm run build && pm2 restart ca2'
 
+deploy_staging_job_master:
+  stage: staging
+  only:
+    - master
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo -e "$STAGING_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 700 ~/.ssh
+    - chmod 600 ~/.ssh/id_rsa
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
+    - echo -n "Deploy staging to staging server..."
+    - ssh ec2-user@$STAGING_DEPLOY_SERVER 'cd Movie_API/ && git pull gitlab master && npm ci && npm run build && pm2 restart ca2'
+    
 
 continuous_delivery:
   stage: deploy
@@ -68,8 +80,7 @@ continuous_delivery:
     - ls
   script:
     - echo -n "Deploy develop to production server..."
-    - scp -r build ec2-user@$MASTER_DEPLOY_SERVER:/home/ec2-user
-    - ssh ec2-user@$MASTER_DEPLOY_SERVER 'rm -rf CICD_CA2/ && mv build/ CICD_CA2/'
+    - ssh ec2-user@$MASTER_DEPLOY_SERVER 'cd Movie_API/ && git pull gitlab develop && npm ci && npm run build && pm2 restart ca2'
   when: manual
 
 continuous_deployment:
@@ -84,6 +95,6 @@ continuous_deployment:
     - ls
   script:
     - echo -n "Deploy develop to production server..."
-    - scp -r build ec2-user@$MASTER_DEPLOY_SERVER:/home/ec2-user
-    - ssh ec2-user@$MASTER_DEPLOY_SERVER 'rm -rf CICD_CA2/ && mv build/ CICD_CA2/'
+    - ssh ec2-user@$MASTER_DEPLOY_SERVER 'cd Movie_API/ && git pull gitlab master && npm ci && npm run build && pm2 restart ca2'
+
 
