@@ -9,6 +9,11 @@ const optimizelyExpress = require('@optimizely/express');
 import swaggerJsdoc from "swagger-jsdoc"
 import swaggerUi from "swagger-ui-express"
 import devOrProd from './middleware/errorHandler/devOrProdError'
+import morgan from 'morgan'
+import fs from 'fs'
+import path from 'path'
+
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'app.log'), { flags: 'a' })
 
 dotenv.config();
 process.on('uncaughtException', err => {
@@ -40,6 +45,10 @@ app.use(optimizely.middleware);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 
+app.use(morgan('combined', {
+  interval: '7d',
+  stream: accessLogStream
+}));
 
 app.get('/', function(req, res, next) {
   const isEnabled = req.optimizely.client.isFeatureEnabled(
