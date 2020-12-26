@@ -2,22 +2,22 @@ import dotenv from 'dotenv';
 import express from 'express';
 import bodyParser from 'body-parser';
 import './db';
+import AppError from './middleware/errorHandler/appError'
 import testRouter from './api/test'
 
 const optimizelyExpress = require('@optimizely/express');
 import swaggerJsdoc from "swagger-jsdoc"
 import swaggerUi from "swagger-ui-express"
+import devOrProd from './middleware/errorHandler/devOrProdError'
 
 dotenv.config();
+process.on('uncaughtException', err => {
+  console.log(err.name, err.message);
+  console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
 
-const errHandler = (err, req, res, next) => {
-  /* if the error in development then send stack trace to display whole error,
-  if it's in production then just send error message  */
-  if(process.env.NODE_ENV === 'production') {
-    return res.status(500).send(`Something went wrong!`);
-  }
-  res.status(500).send(`Hey!! You caught the error 👍👍, ${err.stack} `);
-};
+  process.exit(1);
+
+});
 
 const app = express();
 
@@ -53,8 +53,6 @@ app.get('/', function(req, res, next) {
 
   res.status(200).send('Optimizely Express Example: ' +  (isEnabled ? 'You got the hello world feature!' : 'Feature off.'))
 });
-
-app.use(errHandler);
 
 
 const options = {
@@ -92,6 +90,17 @@ app.use(
 
 
 app.use("/test/",testRouter)
+
+app.all('*', (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+});
+app.use(devOrProd)
+
+process.on('unhandledRejection', err => {
+  console.log(err.name, err.message);
+  console.log('UNHANDLED REJECTION! 💥 Shutting down...');
+  process.exit(1);
+});
 
 app.listen(port, () => {
   console.info(`Server running at ${port}`);
