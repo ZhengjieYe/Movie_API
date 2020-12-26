@@ -13,6 +13,7 @@ import morgan from 'morgan'
 import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
+import helmet from 'helmet'
 
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'app.log'), { flags: 'a' })
 
@@ -40,7 +41,7 @@ const optimizely = optimizelyExpress.initialize({
 
 app.use(optimizely.middleware);
 
-
+app.use(helmet());
 
 //configure body-parser
 app.use(bodyParser.json());
