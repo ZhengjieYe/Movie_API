@@ -12,13 +12,14 @@ import devOrProd from './middleware/errorHandler/devOrProdError'
 import morgan from 'morgan'
 import fs from 'fs'
 import path from 'path'
+import chalk from 'chalk'
 
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'app.log'), { flags: 'a' })
 
 dotenv.config();
 process.on('uncaughtException', err => {
-  console.log(err.name, err.message);
-  console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
+  console.log(chalk.red(err.name, err.message));
+  console.log(chalk.yellow('UNCAUGHT EXCEPTION! 💥 Shutting down...'));
 
   process.exit(1);
 
@@ -106,13 +107,13 @@ app.all('*', (req, res, next) => {
 app.use(devOrProd)
 
 process.on('unhandledRejection', err => {
-  console.log(err.name, err.message);
-  console.log('UNHANDLED REJECTION! 💥 Shutting down...');
+  console.log(chalk.red(err.name, err.message));
+  console.log(chalk.yellow('UNHANDLED REJECTION! 💥 Shutting down...'));
   process.exit(1);
 });
 
 app.listen(port, () => {
-  console.info(`Server running at ${port}`);
+  console.info(chalk.blue(`Server running at ${port}`));
 });
 
 export default app;
