@@ -15,7 +15,7 @@ import morgan from 'morgan'
 import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
-import helmet from 'helmet'
+// import helmet from 'helmet'
 import {getIsEnabled} from './middleware/optimizely/getIsEnabled'
 
 import {loadUsers,loadMovies} from './seedData';
@@ -51,7 +51,7 @@ const optimizely = optimizelyExpress.initialize({
 
 app.use(optimizely.middleware);
 
-app.use(helmet());
+// app.use(helmet());
 
 //configure body-parser
 app.use(bodyParser.json());
