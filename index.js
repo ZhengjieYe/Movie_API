@@ -3,10 +3,12 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import './db';
 import AppError from './middleware/errorHandler/appError'
-import testRouter from './api/test'
+import movieRouter from './api/movies'
+import usersRouter from './api/users';
+import passport from './authenticate';
 
 const optimizelyExpress = require('@optimizely/express');
-import swaggerJsdoc from "swagger-jsdoc"
+// import swaggerJsdoc from "swagger-jsdoc"
 import swaggerUi from "swagger-ui-express"
 import devOrProd from './middleware/errorHandler/devOrProdError'
 import morgan from 'morgan'
@@ -14,6 +16,14 @@ import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
 import helmet from 'helmet'
+import {getIsEnabled} from './middleware/optimizely/getIsEnabled'
+
+import {loadUsers,loadMovies} from './seedData';
+if (process.env.SEED_DB) {
+  loadUsers();
+  loadMovies();
+}
+
 
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'app.log'), { flags: 'a' })
 
@@ -53,54 +63,49 @@ app.use(morgan('combined', {
 }));
 
 app.get('/', function(req, res, next) {
-  const isEnabled = req.optimizely.client.isFeatureEnabled(
-    'movie_app_ca2',       // Feature key connecting feature to UI
-    'yzj',           // String ID used for random percentage-based rollout
-    {
-      customerId: 20091571,   // Attributes used for targeted audience-based rollout
-      isVip: true,
-    }
-  );
+  const isEnabled = getIsEnabled(req, 'movie_app_ca2','yzj',20091571);
 
   res.status(200).send('Optimizely Express Example: ' +  (isEnabled ? 'You got the hello world feature!' : 'Feature off.'))
 });
 
 
-const options = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "YZJ's Movie APP Express API with Swagger",
-      version: "0.1.0",
-      description:
-        "This is a Movie API application made with Express and documented with Swagger",
-      license: {
-        name: "MIT",
-        url: "https://spdx.org/licenses/MIT.html",
-      },
-      contact: {
-        name: "ZhengjieYe",
-        email: "20091571@mail.wit.ie",
-      },
-    },
-    servers: [
-      {
-        url: "http://localhost:8080/",
-      },
-    ],
-  },
-  apis: ["./api/**/index.js"],
-};
+// options deleted by YZJ 20091571
+// const specs = swaggerJsdoc(options);
 
-const specs = swaggerJsdoc(options);
-app.use(
-  "/api-docs",
-  swaggerUi.serve,
-  swaggerUi.setup(specs, { explorer: true })
-);
+// app.use(
+//   "/api-docs",
+//   swaggerUi.serve,
+//   swaggerUi.setup(specs, { explorer: true })
+// );
+const swaggerDocument = require('./public/api-docs.json');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explorer: true }));
 
 
-app.use("/test/",testRouter)
+
+app.use(passport.initialize());
+
+app.use('/api/movies',function(req, res, next){
+  const isEnabled = getIsEnabled(req, 'movie_api_movies','yzj',20091571);
+  if(isEnabled){
+    next()
+  }
+  else {
+    next(new AppError('Movies Feature off by Optimizely.', 403))
+  }
+},passport.authenticate('jwt', {session: false}), movieRouter);
+
+app.use('/api/users', function(req, res, next){
+  const isEnabled = getIsEnabled(req, 'movie_api_users','yzj',20091571);
+  if(isEnabled){
+    next()
+  }
+  else {
+    next(new AppError('Users Feature off by Optimizely.', 403))
+  }
+}, usersRouter);
+
+
+
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
