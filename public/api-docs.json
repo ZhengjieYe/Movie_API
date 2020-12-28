@@ -12,6 +12,12 @@
   "servers": [
     {
       "url": "http://localhost:8080"
+    },
+    {
+      "url": "http://34.255.115.233:8080"
+    },
+    {
+      "url": "http://54.157.43.36:8080"
     }
   ],
   "tags": [
@@ -20,6 +26,9 @@
     },
     {
       "name": "/api/movies"
+    },
+    {
+      "name": "/api/genres"
     }
   ],
   "paths": {
@@ -284,6 +293,30 @@
           }
         }
       }
+    },
+    "/api/genres": {
+      "get": {
+        "tags": [
+          "/api/genres"
+        ],
+        "summary": "get movie's genres",
+        "description": "get movie's genres",
+        "responses": {
+          "200": {
+            "description": "return movie's genres",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/inline_response_200"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -453,6 +486,19 @@
           },
           "username": {
             "type": "string"
+          }
+        }
+      },
+      "inline_response_200": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 80
+          },
+          "name": {
+            "type": "string",
+            "example": "Crime"
           }
         }
       }
