@@ -51,7 +51,7 @@ deploy_staging_job_develop:
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - echo -n "Deploy staging to staging server..."
-    - ssh ec2-user@$STAGING_DEPLOY_SERVER 'cd Movie_API/ && git pull gitlab develop && npm ci && npm run build && pm2 restart ca2'
+    - ssh ec2-user@$STAGING_DEPLOY_SERVER 'cd Movie_API/ && git checkout develop && git pull gitlab develop && npm ci && npm run build && pm2 restart ca2'
 
 deploy_staging_job_master:
   stage: staging
@@ -65,7 +65,7 @@ deploy_staging_job_master:
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - echo -n "Deploy staging to staging server..."
-    - ssh ec2-user@$STAGING_DEPLOY_SERVER 'cd Movie_API/ && git pull gitlab master && npm ci && npm run build && pm2 restart ca2'
+    - ssh ec2-user@$STAGING_DEPLOY_SERVER 'cd Movie_API/ && git checkout master && git pull gitlab master && npm ci && npm run build && pm2 restart ca2'
     
 
 continuous_delivery:
