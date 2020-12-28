@@ -5,6 +5,7 @@ import './db';
 import AppError from './middleware/errorHandler/appError'
 import movieRouter from './api/movies'
 import usersRouter from './api/users';
+import genresRouter from './api/genres';
 import passport from './authenticate';
 
 const optimizelyExpress = require('@optimizely/express');
@@ -18,10 +19,11 @@ import chalk from 'chalk'
 // import helmet from 'helmet'
 import {getIsEnabled} from './middleware/optimizely/getIsEnabled'
 
-import {loadUsers,loadMovies} from './seedData';
+import {loadUsers, loadMovies, loadGenres} from './seedData';
 if (process.env.SEED_DB) {
   loadUsers();
   loadMovies();
+  loadGenres();
 }
 
 
@@ -103,8 +105,7 @@ app.use('/api/users', function(req, res, next){
     next(new AppError('Users Feature off by Optimizely.', 403))
   }
 }, usersRouter);
-
-
+app.use('/api/genres', genresRouter);
 
 
 app.all('*', (req, res, next) => {

@@ -1,6 +1,7 @@
 import userModel from '../api/users/userModel';
-import { getMovies } from '../api/tmdb-api'
+import { getMovies, getGenres } from '../api/tmdb-api'
 import movieModel from '../api/movies/movieModel';
+import genresModel from '../api/genres/genresModel';
 
 const users = [
   {
@@ -35,5 +36,18 @@ export async function loadUsers() {
         console.error(`failed to Load movie Data: ${err}`);
       }
     })
-    }
+  }
+  
+  export async function loadGenres() {
+    console.log('load genres Data');
+    getGenres().then(async res=>{
+      try {
+        await genresModel.deleteMany();
+        await genresModel.collection.insertMany(res);
+        console.info(`${res.length} genres were successfully stored.`);
+      } catch (err) {
+        console.error(`failed to Load movie Data: ${err}`);
+      }
+    })
+  }
   
