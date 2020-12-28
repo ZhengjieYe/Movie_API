@@ -16,7 +16,9 @@ router.get('/:id', (req, res, next) => {
 router.get('/:id/reviews', (req, res, next) => {
   const id = parseInt(req.params.id);
   getMovieReviews(id)
-  .then(reviews => res.status(200).send(reviews))
+  .then(reviews => res.status(200).json({
+    "reviews":reviews ? reviews : []
+  }))
   .catch((error) => next(error));
 });
 

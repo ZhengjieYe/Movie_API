@@ -5,7 +5,6 @@ import movieModel from '../movies/movieModel'
 import { use } from 'passport';
 
 const router = express.Router(); // eslint-disable-line
-
 // Get all users
 router.get('/', (req, res, next) => {
     User.find().then(users =>  res.status(200).json(users)).catch(next);

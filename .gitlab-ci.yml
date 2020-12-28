@@ -1,0 +1,100 @@
+image: node:latest
+
+variables:
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+  NODE_ENV: 'test'
+
+cache:
+  key:
+    files:
+      - package.json
+  paths:
+    - .npm
+    - node_modules
+
+services:
+   - mongo
+
+stages:
+  - install
+  - build
+  - test
+  - staging
+  - deploy
+
+install_dependencies:
+  stage: install
+  script:
+    - npm  ci
+
+Build_api:
+  stage: build
+  before_script:
+     - npm run clean
+  script:
+    - npm run build
+
+test_api:
+  stage: test
+  script:
+    - npm test
+
+deploy_staging_job_develop:
+  stage: staging
+  only:
+    - develop
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo -e "$STAGING_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 700 ~/.ssh
+    - chmod 600 ~/.ssh/id_rsa
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
+    - echo -n "Deploy staging to staging server..."
+    - ssh ec2-user@$STAGING_DEPLOY_SERVER 'cd Movie_API/ && git checkout develop && git pull gitlab develop && npm ci && npm run build && pm2 restart ca2'
+
+deploy_staging_job_master:
+  stage: staging
+  only:
+    - master
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo -e "$STAGING_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 700 ~/.ssh
+    - chmod 600 ~/.ssh/id_rsa
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
+    - echo -n "Deploy staging to staging server..."
+    - ssh ec2-user@$STAGING_DEPLOY_SERVER 'cd Movie_API/ && git checkout master && git pull gitlab master && npm ci && npm run build && pm2 restart ca2'
+    
+
+continuous_delivery:
+  stage: deploy
+  only:
+    - develop
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo -e "$MASTER_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - ls
+  script:
+    - echo -n "Deploy develop to production server..."
+    - ssh ec2-user@$MASTER_DEPLOY_SERVER 'cd Movie_API/ && git pull gitlab develop && npm ci && npm run build && pm2 restart ca2'
+  when: manual
+
+continuous_deployment:
+  stage: deploy
+  only:
+    - master
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo -e "$MASTER_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - ls
+  script:
+    - echo -n "Deploy develop to production server..."
+    - ssh ec2-user@$MASTER_DEPLOY_SERVER 'cd Movie_API/ && git pull gitlab master && npm ci && npm run build && pm2 restart ca2'
+
+

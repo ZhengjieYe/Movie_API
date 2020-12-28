@@ -1,6 +1,6 @@
 import userModel from '../api/users/userModel';
+import { getMovies } from '../api/tmdb-api'
 import movieModel from '../api/movies/movieModel';
-import {movies} from './movies.js';
 
 const users = [
   {
@@ -24,15 +24,16 @@ export async function loadUsers() {
     }
   }
 
-// deletes all movies documents in collection and inserts test data
-export async function loadMovies() {
-  console.log('load seed data');
-  console.log(movies.length);
-  try {
-    await movieModel.deleteMany();
-    await movieModel.collection.insertMany(movies);
-    console.info(`${movies.length} Movies were successfully stored.`);
-  } catch (err) {
-    console.error(`failed to Load movie Data: ${err}`);
-  }
-}
+  export async function loadMovies() {
+    console.log('load movies Data');
+    getMovies().then(async res=>{
+      try {
+        await movieModel.deleteMany();
+        await movieModel.collection.insertMany(res);
+        console.info(`${res.length} Movies were successfully stored.`);
+      } catch (err) {
+        console.error(`failed to Load movie Data: ${err}`);
+      }
+    })
+    }
+  
