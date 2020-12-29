@@ -22,9 +22,21 @@ before(function (done) {
   },4000)
 });
 
-const token="eyJhbGciOiJIUzI1NiJ9.dXNlcjE.FmYria8wq0aFDHnzYWhKQrhF5BkJbFNN1PqNyNQ7V4M";
+let token;
 
 describe("Movies endpoint", () => {
+  before((done)=>{
+    request(api)
+      .post('/api/users/login')
+      .send({
+        "username": "user2",
+        "password": "test2"
+      })
+      .end((req,res)=>{
+        token=res.body.token.split(" ")[1];
+        done();
+      })
+  })
   describe("GET /api/movies", ()=>{
     it("should return 20 movies and a status 200 with Bearer token",(done)=>{
       request(api)
