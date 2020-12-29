@@ -6,6 +6,16 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema({
   username: {type: String, unique: true, required: true},
   password: {type: String, required: true },
+  role:{
+    type: String,
+    required: true,
+    validate: {
+      validator: function(role){
+        return ['admin', 'normal'].indexOf(role)!==-1
+      },
+      message: "The role is not allowd!"
+    }
+  },
   favourites: [{type: mongoose.Schema.Types.ObjectId, ref: 'Movies'}]
 });
 
