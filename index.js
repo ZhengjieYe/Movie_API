@@ -6,7 +6,7 @@ import AppError from './middleware/errorHandler/appError'
 import movieRouter from './api/movies'
 import usersRouter from './api/users';
 import genresRouter from './api/genres';
-import passport from './authenticate';
+import upcomingRouter from './api/upcoming';
 
 const optimizelyExpress = require('@optimizely/express');
 // import swaggerJsdoc from "swagger-jsdoc"
@@ -16,14 +16,16 @@ import morgan from 'morgan'
 import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
+import passport from './authenticate';
 // import helmet from 'helmet'
 import {getIsEnabled} from './middleware/optimizely/getIsEnabled'
 
-import {loadUsers, loadMovies, loadGenres} from './seedData';
+import {loadUsers, loadMovies, loadGenres, loadUpcomingMovies} from './seedData';
 if (process.env.SEED_DB) {
   loadUsers();
   loadMovies();
   loadGenres();
+  loadUpcomingMovies();
 }
 
 
@@ -105,8 +107,24 @@ app.use('/api/users', function(req, res, next){
     next(new AppError('Users Feature off by Optimizely.', 403))
   }
 }, usersRouter);
-app.use('/api/genres', genresRouter);
-
+app.use('/api/genres', function(req, res, next){
+  const isEnabled = getIsEnabled(req, 'movie_api_genres','yzj',20091571);
+  if(isEnabled){
+    next()
+  }
+  else {
+    next(new AppError('Users Feature off by Optimizely.', 403))
+  }
+}, genresRouter);
+app.use('/api/upcoming', function(req, res, next){
+  const isEnabled = getIsEnabled(req, 'movie_api_upcoming','yzj',20091571);
+  if(isEnabled){
+    next()
+  }
+  else {
+    next(new AppError('Users Feature off by Optimizely.', 403))
+  }
+}, upcomingRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
