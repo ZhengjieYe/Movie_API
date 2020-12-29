@@ -1,26 +1,27 @@
 import chai from "chai";
 import request from "supertest";
-import api from "../../../../index";
 import {getMovies} from '../../../../api/tmdb-api'
 
 const expect = chai.expect;
 
-before(function (done) {
-  console.log('wait for optimizely...');
-  setTimeout(()=>{
-    console.log('optimizely done...');
-    done()
-  },4000)
-});
-
+let api;
 let admin_token;
 let normal_token;
 let admin_refresh_token;
 let normal_refresh_token;
 
 describe("Users endpoint", () => {
-  before((done)=>{
-    request(api)
+  beforeEach(function (done) {
+    try {
+      api = require("../../../../index");
+    } catch (err) {
+      console.error(`failed to Load express server: ${err}`);
+    }
+    console.log('wait for optimizely...');
+    
+    setTimeout(()=>{
+      console.log('optimizely done...');
+      request(api)
         .post('/api/users/login')
         .send({
           "username": "user1",
@@ -29,8 +30,8 @@ describe("Users endpoint", () => {
         .end((req,res)=>{
           admin_token=res.body.token.split(" ")[1];
           admin_refresh_token=res.body.refreshToken;
-        })
-    request(api)
+        });
+      request(api)
         .post('/api/users/login')
         .send({
           "username": "user2",
@@ -41,7 +42,9 @@ describe("Users endpoint", () => {
           normal_refresh_token=res.body.refreshToken;
           done();
         })
-  })
+    },4000)
+  });
+
   describe("POST /api/users/login",()=>{
     it("should return token and refresh token and a status 200 with admin account",(done)=>{
       request(api)

@@ -1,18 +1,24 @@
 import chai from "chai";
 import request from "supertest";
-import api from "../../../../index";
 
 const expect = chai.expect;
-
-before(function (done) {
-  console.log('wait for optimizely...');
-  setTimeout(()=>{
-    console.log('optimizely done...');
-    done()
-  },4000)
-});
+let api;
 
 describe("Upcoming endpoint",()=>{
+  beforeEach(function (done) {
+    try {
+      api = require("../../../../index");
+    } catch (err) {
+      console.error(`failed to Load express server: ${err}`);
+    }
+    
+    console.log('wait for optimizely...');
+    setTimeout(()=>{
+      console.log('optimizely done...');
+      done();
+    },4000)
+  });
+  
   describe("GET /api/upcoming",()=>{
     it("should return 20 upcoming movies and a status 200",(done)=>{
       request(api)

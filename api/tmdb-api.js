@@ -36,3 +36,9 @@ export const getMovies = () => {
       .then(res => res.json())
       .then(json => json.results);
   };
+
+  export const getTopRated= async (page) => {
+    return fetch(`https://api.themoviedb.org/3/movie/top_rated?api_key=${process.env.TMDB_KEY}&language=en-US&page=${page}`)
+      .then(res => res.json())
+      .then(json => json.results)
+  }

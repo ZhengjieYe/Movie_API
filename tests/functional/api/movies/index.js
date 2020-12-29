@@ -1,32 +1,26 @@
 import chai from "chai";
 import request from "supertest";
-import api from "../../../../index";
 import {getMovies, getMovieReviews} from '../../../../api/tmdb-api'
 
 const expect = chai.expect;
 
+let api;
 let movie;
 let reviews;
-before(function (done) {
-  console.log('wait for optimizely...');
-  getMovies().then((res)=>{
-    movie=res[0]
-    getMovieReviews(movie.id).then(res=>{
-      reviews=res;
-      }
-    )
-  })
-  setTimeout(()=>{
-    console.log('optimizely done...');
-    done()
-  },4000)
-});
-
 let token;
 
 describe("Movies endpoint", () => {
-  before((done)=>{
-    request(api)
+  beforeEach(function (done) {
+    try {
+      api = require("../../../../index");
+    } catch (err) {
+      console.error(`failed to Load express server: ${err}`);
+    }
+    
+    console.log('wait for optimizely...');
+    setTimeout(()=>{
+      console.log('optimizely done...');
+      request(api)
       .post('/api/users/login')
       .send({
         "username": "user2",
@@ -34,9 +28,24 @@ describe("Movies endpoint", () => {
       })
       .end((req,res)=>{
         token=res.body.token.split(" ")[1];
-        done();
       })
-  })
+
+      getMovies().then((res)=>{
+        movie=res[0]
+        getMovieReviews(movie.id).then(res=>{
+          reviews=res;
+          done();
+          }
+        )
+      })
+    },4000)
+  });
+
+  afterEach(() => {
+    api.close(); // Release PORT 8080
+    delete require.cache[require.resolve("../../../../index")];
+  });
+  
   describe("GET /api/movies", ()=>{
     it("should return 20 movies and a status 200 with Bearer token",(done)=>{
       request(api)
