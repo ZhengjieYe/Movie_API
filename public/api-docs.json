@@ -12,6 +12,12 @@
   "servers": [
     {
       "url": "http://localhost:8080"
+    },
+    {
+      "url": "http://34.255.115.233:8080"
+    },
+    {
+      "url": "http://54.157.43.36:8080"
     }
   ],
   "tags": [
@@ -20,6 +26,9 @@
     },
     {
       "name": "/api/movies"
+    },
+    {
+      "name": "/api/genres"
     }
   ],
   "paths": {
@@ -28,8 +37,8 @@
         "tags": [
           "/api/users"
         ],
-        "summary": "get users list",
-        "description": "get users list",
+        "summary": "get users list with admin token",
+        "description": "get users list with admin token",
         "responses": {
           "200": {
             "description": "return users list",
@@ -40,28 +49,32 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "invalid token provided",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_403"
+                }
+              }
+            }
           }
-        }
-      },
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/users/login": {
       "post": {
         "tags": [
           "/api/users"
         ],
-        "summary": "authticate users or register users",
-        "description": "authticate users or register users",
-        "parameters": [
-          {
-            "name": "action",
-            "in": "query",
-            "required": false,
-            "style": "form",
-            "explode": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "register"
-          }
-        ],
+        "summary": "authticate users",
+        "description": "authticate users",
         "requestBody": {
           "content": {
             "application/json": {
@@ -73,10 +86,10 @@
                   "value": "{\n    \"username\": \"user1\",\n    \"password\": \"test1\"\n}"
                 },
                 "1": {
-                  "value": "{\n    \"username\": \"yzj\",\n    \"password\": \"yzj\"\n}"
+                  "value": "{\n    \"username\": \"wrong uer\",\n    \"password\": \"wrong pass\"\n}"
                 },
                 "2": {
-                  "value": "{\n    \"username\": \"yzj\",\n    \"password\": \"yzjYZJ1\"\n}"
+                  "value": "{\n    \"username\": \"user2\",\n    \"password\": \"test2\"\n}"
                 }
               }
             }
@@ -88,27 +101,17 @@
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/post_user_200"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Successful register",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/post_user_201"
+                  "$ref": "#/components/schemas/post_user_login_200"
                 }
               }
             }
           },
           "401": {
-            "description": "Bad password format",
+            "description": "Bad password or user id",
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/post_user_401"
+                  "$ref": "#/components/schemas/post_user_login_401"
                 }
               }
             }
@@ -116,13 +119,66 @@
         }
       }
     },
-    "/api/users/favourites": {
+    "/api/users/token": {
+      "post": {
+        "tags": [
+          "/api/users"
+        ],
+        "summary": "Get new token with refresh token",
+        "description": "Get new token with refresh token",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/body_1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "return new token",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/post_user_token_200"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Token invalid",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_403_1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{username}/favourites": {
       "get": {
         "tags": [
           "/api/users"
         ],
         "summary": "get users favourites list",
         "description": "get users favourites list",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "username",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "return users favourites list",
@@ -142,6 +198,19 @@
         ],
         "summary": "add to users favourites list",
         "description": "add to users favourites list",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "username",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -162,8 +231,8 @@
               }
             }
           },
-          "500": {
-            "description": "something wrong",
+          "401": {
+            "description": "Already in favourites",
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
@@ -284,6 +353,30 @@
           }
         }
       }
+    },
+    "/api/genres": {
+      "get": {
+        "tags": [
+          "/api/genres"
+        ],
+        "summary": "get movie's genres",
+        "description": "get movie's genres",
+        "responses": {
+          "200": {
+            "description": "return movie's genres",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/inline_response_200"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -308,10 +401,14 @@
           "password": {
             "type": "string",
             "example": "test1"
+          },
+          "role": {
+            "type": "string",
+            "example": "admin"
           }
         }
       },
-      "post_user_200": {
+      "post_user_login_200": {
         "type": "object",
         "properties": {
           "success": {
@@ -320,7 +417,37 @@
           },
           "token": {
             "type": "string",
-            "example": "5fe866247882a6019cc77be2"
+            "example": "BEARER eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIxIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNjA5MTkxNTI4fQ.EaE43zPeDLVrfYkE5cWikVAbLBi0-ESIFy0OaVa2rGo"
+          },
+          "refreshtoken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIxIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNjA5MTkxNTI4fQ.rZydbHP4CfjGvz32STF7k9Lqgin6A6E7_CP48sL1H-M"
+          }
+        }
+      },
+      "post_user_login_401": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "example": 401
+          },
+          "msg": {
+            "type": "string",
+            "example": "Authentication failed. User not found."
+          }
+        }
+      },
+      "post_user_token_200": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "accessToken": {
+            "type": "string",
+            "example": "BEARER eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIxIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNjA5MTkxNTI4fQ.EaE43zPeDLVrfYkE5cWikVAbLBi0-ESIFy0OaVa2rGo"
           }
         }
       },
@@ -377,13 +504,13 @@
       "error": {
         "type": "object",
         "properties": {
-          "status": {
-            "type": "string",
-            "example": "error"
+          "code": {
+            "type": "number",
+            "example": 401
           },
-          "message": {
+          "msg": {
             "type": "string",
-            "example": "Something went very wrong!"
+            "example": "Already in favourites."
           }
         }
       },
@@ -445,6 +572,19 @@
           }
         }
       },
+      "inline_response_403": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "fail"
+          },
+          "message": {
+            "type": "string",
+            "example": "Invalid Token"
+          }
+        }
+      },
       "body": {
         "type": "object",
         "properties": {
@@ -453,6 +593,41 @@
           },
           "username": {
             "type": "string"
+          }
+        }
+      },
+      "body_1": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIyIiw..."
+          }
+        }
+      },
+      "inline_response_403_1": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Token is invalid!"
+          }
+        }
+      },
+      "inline_response_200": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 80
+          },
+          "name": {
+            "type": "string",
+            "example": "Crime"
           }
         }
       }
