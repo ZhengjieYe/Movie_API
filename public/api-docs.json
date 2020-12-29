@@ -29,6 +29,9 @@
     },
     {
       "name": "/api/genres"
+    },
+    {
+      "name": "/api/upcoming"
     }
   ],
   "paths": {
@@ -371,6 +374,27 @@
                   "items": {
                     "$ref": "#/components/schemas/inline_response_200"
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/upcoming": {
+      "get": {
+        "tags": [
+          "/api/upcoming"
+        ],
+        "summary": "Get upcoming movies",
+        "description": "Get upcoming movies",
+        "responses": {
+          "200": {
+            "description": "return upcoming movies",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/movies"
                 }
               }
             }
