@@ -32,6 +32,9 @@
     },
     {
       "name": "/api/upcoming"
+    },
+    {
+      "name": "/api/topRated"
     }
   ],
   "paths": {
@@ -40,11 +43,11 @@
         "tags": [
           "/api/users"
         ],
-        "summary": "get users list with admin token",
-        "description": "get users list with admin token",
+        "summary": "Get users list with admin token",
+        "description": "Get users list with admin token",
         "responses": {
           "200": {
-            "description": "return users list",
+            "description": "Return users list",
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
@@ -54,7 +57,7 @@
             }
           },
           "403": {
-            "description": "invalid token provided",
+            "description": "Invalid token provided",
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
@@ -76,8 +79,8 @@
         "tags": [
           "/api/users"
         ],
-        "summary": "authticate users",
-        "description": "authticate users",
+        "summary": "Authticate users",
+        "description": "Authticate users",
         "requestBody": {
           "content": {
             "application/json": {
@@ -122,6 +125,87 @@
         }
       }
     },
+    "/api/users/register": {
+      "post": {
+        "tags": [
+          "/api/users"
+        ],
+        "summary": "Register",
+        "description": "Register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/body_1"
+              },
+              "examples": {
+                "0": {
+                  "value": "{\n    \"username\": \"newUser\",\n    \"password\": \"newUser\"\n}"
+                },
+                "1": {
+                  "value": "{\n    \"username\": \"newUser2\",\n    \"password\": \"1\"\n}"
+                },
+                "2": {
+                  "value": "{\n    \"username\": \"user1\",\n    \"password\": \"test1\"\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful register",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/post_user_register_201"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bad password or user id",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/post_user_register_401"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/logout": {
+      "post": {
+        "tags": [
+          "/api/users"
+        ],
+        "summary": "Log out with refresh token",
+        "description": "Log out with refresh token",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/body_2"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Log out successfully",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/post_user_logout_200"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/users/token": {
       "post": {
         "tags": [
@@ -133,7 +217,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/body_1"
+                "$ref": "#/components/schemas/body_3"
               }
             }
           }
@@ -199,8 +283,8 @@
         "tags": [
           "/api/users"
         ],
-        "summary": "add to users favourites list",
-        "description": "add to users favourites list",
+        "summary": "Add to users favourites list",
+        "description": "Add to users favourites list",
         "parameters": [
           {
             "name": "username",
@@ -252,8 +336,8 @@
         "tags": [
           "/api/movies"
         ],
-        "summary": "get movies list",
-        "description": "get movies list",
+        "summary": "Get movies list",
+        "description": "Get movies list",
         "responses": {
           "200": {
             "description": "return movies list",
@@ -288,8 +372,8 @@
         "tags": [
           "/api/movies"
         ],
-        "summary": "get movie",
-        "description": "get movie",
+        "summary": "Get movie",
+        "description": "Get movie",
         "parameters": [
           {
             "name": "id",
@@ -323,8 +407,8 @@
         "tags": [
           "/api/movies"
         ],
-        "summary": "get movie's reviews",
-        "description": "get movie's reviews",
+        "summary": "Get movie's reviews",
+        "description": "Get movie's reviews",
         "parameters": [
           {
             "name": "id",
@@ -362,8 +446,8 @@
         "tags": [
           "/api/genres"
         ],
-        "summary": "get movie's genres",
-        "description": "get movie's genres",
+        "summary": "Get movie's genres",
+        "description": "Get movie's genres",
         "responses": {
           "200": {
             "description": "return movie's genres",
@@ -395,6 +479,50 @@
               "application/json; charset=utf-8": {
                 "schema": {
                   "$ref": "#/components/schemas/movies"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/topRated": {
+      "get": {
+        "tags": [
+          "/api/topRated"
+        ],
+        "summary": "Get top rated movies",
+        "description": "Get top rated movies",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "page of top rated movies",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return top rated movies",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/movies"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Page not exist",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_404"
                 }
               }
             }
@@ -475,7 +603,20 @@
           }
         }
       },
-      "post_user_201": {
+      "post_user_logout_200": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Logout successfully."
+          }
+        }
+      },
+      "post_user_register_201": {
         "type": "object",
         "properties": {
           "code": {
@@ -488,7 +629,7 @@
           }
         }
       },
-      "post_user_401": {
+      "post_user_register_401": {
         "type": "object",
         "properties": {
           "code": {
@@ -623,6 +764,26 @@
       "body_1": {
         "type": "object",
         "properties": {
+          "password": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
+      "body_2": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIyIiw..."
+          }
+        }
+      },
+      "body_3": {
+        "type": "object",
+        "properties": {
           "token": {
             "type": "string",
             "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIyIiw..."
@@ -652,6 +813,19 @@
           "name": {
             "type": "string",
             "example": "Crime"
+          }
+        }
+      },
+      "inline_response_404": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "fail"
+          },
+          "message": {
+            "type": "string",
+            "example": "Page number is too long!"
           }
         }
       }
