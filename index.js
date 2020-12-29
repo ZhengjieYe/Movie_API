@@ -7,6 +7,7 @@ import movieRouter from './api/movies'
 import usersRouter from './api/users';
 import genresRouter from './api/genres';
 import upcomingRouter from './api/upcoming';
+import topRatedRouter from './api/topRated';
 
 const optimizelyExpress = require('@optimizely/express');
 // import swaggerJsdoc from "swagger-jsdoc"
@@ -20,12 +21,13 @@ import passport from './authenticate';
 // import helmet from 'helmet'
 import {getIsEnabled} from './middleware/optimizely/getIsEnabled'
 
-import {loadUsers, loadMovies, loadGenres, loadUpcomingMovies} from './seedData';
+import {loadUsers, loadMovies, loadGenres, loadUpcomingMovies, loadTopRatedMovies} from './seedData';
 if (process.env.SEED_DB) {
   loadUsers();
   loadMovies();
   loadGenres();
   loadUpcomingMovies();
+  loadTopRatedMovies();
 }
 
 
@@ -125,6 +127,16 @@ app.use('/api/upcoming', function(req, res, next){
     next(new AppError('Users Feature off by Optimizely.', 403))
   }
 }, upcomingRouter);
+app.use('/api/topRated', function(req, res, next){
+  const isEnabled = getIsEnabled(req, 'movie_api_top','yzj',20091571);
+  if(isEnabled){
+    next()
+  }
+  else {
+    next(new AppError('Users Feature off by Optimizely.', 403))
+  }
+}, topRatedRouter);
+
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
@@ -137,8 +149,8 @@ process.on('unhandledRejection', err => {
   process.exit(1);
 });
 
-app.listen(port, () => {
+const server=app.listen(port, () => {
   console.info(chalk.blue(`Server running at ${port}`));
 });
 
-export default app;
+module.exports=server;

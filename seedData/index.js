@@ -1,8 +1,9 @@
 import userModel from '../api/users/userModel';
-import { getMovies, getGenres, getUpcomingMovies } from '../api/tmdb-api'
+import { getMovies, getGenres, getUpcomingMovies, getTopRated } from '../api/tmdb-api'
 import movieModel from '../api/movies/movieModel';
 import genresModel from '../api/genres/genresModel';
 import upcomingModel from '../api/upcoming/upcomingModel';
+import topRatedModel from '../api/topRated/topRatedModel';
 
 const users = [
   {
@@ -68,5 +69,22 @@ export async function loadUsers() {
     })
   }
 
-
+  export async function loadTopRatedMovies() {
+    console.log('load Top rated movies data');
+    
+    try {
+      const top1=await getTopRated(1);
+      const top2=await getTopRated(2);
+      const top3=await getTopRated(3);
+      const top4=await getTopRated(4);
+      await topRatedModel.deleteMany();
+      await topRatedModel.collection.insertMany(top1);
+      await topRatedModel.collection.insertMany(top2);
+      await topRatedModel.collection.insertMany(top3);
+      await topRatedModel.collection.insertMany(top4);
+      console.info(`${top1.length+top2.length+top3.length+top4.length} top rated movies were successfully stored.`);
+    } catch (err) {
+      console.error(`failed to Load movie Data: ${err}`);
+    }
+  }
   

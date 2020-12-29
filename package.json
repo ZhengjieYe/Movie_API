@@ -20,7 +20,7 @@
     "compile:all": "npm-run-all compile:app compile:upcoming compile:genres compile:movies compile:users compile:tmdb compile:middleware compile:db compile:data compile:authenticate compile:copy",
     "build": "npm-run-all clean compile:all",
     "serve": "node ./build/index.js",
-    "test": "mocha --timeout 5000"
+    "test": "mocha --timeout 8000"
   },
   "author": "ZhengjieYe <20091571@mail.wit.ie>",
   "license": "ISC",
