@@ -16,7 +16,9 @@ const UserSchema = new Schema({
       message: "The role is not allowd!"
     }
   },
-  favourites: [{type: mongoose.Schema.Types.ObjectId, ref: 'Movies'}]
+  favourites: [{type: mongoose.Schema.Types.ObjectId, ref: 'Movies'}],
+  watchlist: [{type: mongoose.Schema.Types.ObjectId, ref: 'Upcoming'}]
+
 });
 
 UserSchema.statics.findByUserName = function (username) {

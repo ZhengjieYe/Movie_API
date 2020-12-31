@@ -29,5 +29,8 @@ const UpcomingModel=new Schema({
   status: { type: String },
   tagline: { type: String }
 })
+UpcomingModel.statics.findByMovieDBId = function (id) {
+  return this.findOne({ id: id });
+};
 
 export default mongoose.model("Upcoming", UpcomingModel);

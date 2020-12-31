@@ -486,6 +486,206 @@
         }
       }
     },
+    "/api/upcoming/watchlist": {
+      "get": {
+        "tags": [
+          "/api/upcoming"
+        ],
+        "summary": "Get a user's watchlist",
+        "description": "Get a user's watchlist",
+        "responses": {
+          "200": {
+            "description": "Return a user's watchlist",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_1"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Lack of Token",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "/api/upcoming"
+        ],
+        "summary": "Add movie to watchlist",
+        "description": "Add movie to watchlist",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/body_4"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Add movie successfully",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_1"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Already in watchlist",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_403_2"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/upcoming/watchlist/validate_with_login": {
+      "post": {
+        "tags": [
+          "/api/upcoming"
+        ],
+        "summary": "Get a user's watchlist by login",
+        "description": "Get a user's watchlist by login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/body_5"
+              },
+              "examples": {
+                "0": {
+                  "value": "{\n    \"username\": \"user1\",\n    \"password\": \"test1\"\n}"
+                },
+                "1": {
+                  "value": "{\n    \"username\": \"user1\",\n    \"password\": \"test\"\n}"
+                },
+                "2": {
+                  "value": "{\n    \"username\": \"user\",\n    \"password\": \"user\"\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return a user's watchlist",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_1"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Password error",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_401_1"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Invalid user",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/upcoming/watchlist/{id}": {
+      "delete": {
+        "tags": [
+          "/api/upcoming"
+        ],
+        "summary": "Delete a movie from a user's watchlist",
+        "description": "Delete a movie from a user's watchlist",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of movie to delete",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete successfully",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_2"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Lack of Token",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The movie not exist in watchlist",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_403_3"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/api/topRated": {
       "get": {
         "tags": [
@@ -813,6 +1013,131 @@
           "name": {
             "type": "string",
             "example": "Crime"
+          }
+        }
+      },
+      "inline_response_200_1": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "watchlist": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "5fece16d87e5e052f8346db5"
+            }
+          }
+        }
+      },
+      "inline_response_401": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "fail"
+          },
+          "message": {
+            "type": "string",
+            "example": "Lack of Token"
+          }
+        }
+      },
+      "body_4": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 784234
+          }
+        }
+      },
+      "inline_response_403_2": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "example": 403
+          },
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Already in watchlist."
+          }
+        }
+      },
+      "body_5": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "paswword": {
+            "type": "string"
+          }
+        }
+      },
+      "inline_response_401_1": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Authentication failed. Wrong password."
+          }
+        }
+      },
+      "inline_response_500": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "error"
+          },
+          "message": {
+            "type": "string",
+            "example": "Invalid user!"
+          }
+        }
+      },
+      "inline_response_200_2": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "delete": {
+            "type": "boolean",
+            "example": true
+          },
+          "watchlist": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "5fece16d87e5e052f8346db5"
+            }
+          }
+        }
+      },
+      "inline_response_403_3": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "The movie not in the watchlist!"
           }
         }
       },
