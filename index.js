@@ -20,6 +20,7 @@ import chalk from 'chalk'
 import passport from './authenticate';
 // import helmet from 'helmet'
 import {getIsEnabled} from './middleware/optimizely/getIsEnabled'
+import {optimizelyController} from './middleware/optimizely/optimizelyController'
 
 import {loadUsers, loadMovies, loadGenres, loadUpcomingMovies, loadTopRatedMovies} from './seedData';
 if (process.env.SEED_DB) {
@@ -90,52 +91,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explore
 
 app.use(passport.initialize());
 
-app.use('/api/movies',function(req, res, next){
-  const isEnabled = getIsEnabled(req, 'movie_api_movies','yzj',20091571);
-  if(isEnabled){
-    next()
-  }
-  else {
-    next(new AppError('Movies Feature off by Optimizely.', 403))
-  }
-},passport.authenticate('jwt', {session: false}), movieRouter);
-
-app.use('/api/users', function(req, res, next){
-  const isEnabled = getIsEnabled(req, 'movie_api_users','yzj',20091571);
-  if(isEnabled){
-    next()
-  }
-  else {
-    next(new AppError('Users Feature off by Optimizely.', 403))
-  }
-}, usersRouter);
-app.use('/api/genres', function(req, res, next){
-  const isEnabled = getIsEnabled(req, 'movie_api_genres','yzj',20091571);
-  if(isEnabled){
-    next()
-  }
-  else {
-    next(new AppError('Users Feature off by Optimizely.', 403))
-  }
-}, genresRouter);
-app.use('/api/upcoming', function(req, res, next){
-  const isEnabled = getIsEnabled(req, 'movie_api_upcoming','yzj',20091571);
-  if(isEnabled){
-    next()
-  }
-  else {
-    next(new AppError('Users Feature off by Optimizely.', 403))
-  }
-}, upcomingRouter);
-app.use('/api/topRated', function(req, res, next){
-  const isEnabled = getIsEnabled(req, 'movie_api_top','yzj',20091571);
-  if(isEnabled){
-    next()
-  }
-  else {
-    next(new AppError('Users Feature off by Optimizely.', 403))
-  }
-}, topRatedRouter);
+app.use('/api/movies', optimizelyController('movie_api_movies'), passport.authenticate('jwt', {session: false}), movieRouter);
+app.use('/api/users', optimizelyController('movie_api_users'), usersRouter);
+app.use('/api/genres', optimizelyController('movie_api_genres'), genresRouter);
+app.use('/api/upcoming', optimizelyController('movie_api_upcoming'), upcomingRouter);
+app.use('/api/topRated', optimizelyController('movie_api_top'), topRatedRouter);
 
 
 app.all('*', (req, res, next) => {
