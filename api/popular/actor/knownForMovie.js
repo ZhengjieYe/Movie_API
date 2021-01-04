@@ -31,7 +31,7 @@ const KnowForMovie = new Schema({
   tagline: { type: String }
 });
 
-KnowForMovie.statics.findById = function (id) {
+KnowForMovie.statics.findByMovieId = function (id) {
   return this.findOne({ id: id });
 };
 

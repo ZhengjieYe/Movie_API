@@ -1,11 +1,30 @@
 import chai from "chai";
 import request from "supertest";
+const mongoose = require("mongoose");
 
 const expect = chai.expect;
 let api;
 let token;
+let db;
 
 describe("Upcoming endpoint",()=>{
+  before(() => {
+    mongoose.connect(String(process.env.mongoDB), {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    db = mongoose.connection;
+    console.log('connect to db for testing.');
+  });
+
+  after(async () => {
+    try {
+      await db.close();
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
   beforeEach(function (done) {
     try {
       api = require("../../../../index");

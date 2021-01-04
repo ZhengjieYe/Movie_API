@@ -1,13 +1,31 @@
 import chai from "chai";
 import request from "supertest";
 import {getTopRated} from '../../../../api/tmdb-api'
+const mongoose = require("mongoose");
 
 const expect = chai.expect;
 let api;
 let top;
-
+let db;
 
 describe("topRated endpoint",()=>{
+  before(() => {
+    mongoose.connect(String(process.env.mongoDB), {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    db = mongoose.connection;
+    console.log('connect to db for testing.');
+  });
+
+  after(async () => {
+    try {
+      await db.close();
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
   beforeEach(function (done) {
     try {
       api = require("../../../../index");
@@ -22,7 +40,7 @@ describe("topRated endpoint",()=>{
         top=res;
         done()
       })
-    },4000)
+    },7000)
   });
   
   afterEach(() => {

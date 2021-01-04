@@ -103,9 +103,9 @@ export async function loadUsers() {
       const newActors = await Promise.all(actors.map(async (actor)=>{
         let known_for = actor.known_for;
         const known_for_id=await Promise.all(known_for.map(async (k)=>{
-          await knowForModel.collection.insertOne(k,(err)=>{});
-          const know_forMovie=await knowForModel.findById(k.id);
-          return know_forMovie._id;
+          await knowForModel.collection.insertOne(k,(err,doc)=>{});
+          const know_forMovie=await knowForModel.findByMovieId(k.id);
+          if(know_forMovie) return know_forMovie._id;
         }));
         return {
           ...actor,

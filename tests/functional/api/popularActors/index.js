@@ -60,7 +60,7 @@ describe("Popular Actors endpoint",()=>{
           normalToken=res.body.token.split(" ")[1];
           done();
         })
-    },4000)
+    },7000)
   });
 
   afterEach(() => {

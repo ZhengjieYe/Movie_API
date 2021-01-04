@@ -1,6 +1,7 @@
 import chai from "chai";
 import request from "supertest";
 import {getMovies} from '../../../../api/tmdb-api'
+const mongoose = require("mongoose");
 
 const expect = chai.expect;
 
@@ -9,8 +10,25 @@ let admin_token;
 let normal_token;
 let admin_refresh_token;
 let normal_refresh_token;
+let db;
 
 describe("Users endpoint", () => {
+  before(() => {
+    mongoose.connect(String(process.env.mongoDB), {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    db = mongoose.connection;
+    console.log('connect to db for testing.');
+  });
+
+  after(async () => {
+    try {
+      await db.close();
+    } catch (error) {
+      console.log(error);
+    }
+  });
   beforeEach(function (done) {
     try {
       api = require("../../../../index");
@@ -149,7 +167,7 @@ describe("Users endpoint", () => {
   describe("/api/users/:username/favourites endpoint",()=>{
     let movies;
 
-    before((done)=>{
+    beforeEach((done)=>{
       getMovies().then((res)=>{
         movies=res;
         request(api)
