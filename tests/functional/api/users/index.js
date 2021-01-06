@@ -64,103 +64,118 @@ describe("Users endpoint", () => {
   });
 
   describe("POST /api/users/login",()=>{
-    it("should return token and refresh token and a status 200 with admin account",(done)=>{
-      request(api)
-        .post('/api/users/login')
-        .send({
-          "username": "user1",
-          "password": "test1"
-        })
-        .expect(200)
-        .end((req,res)=>{
-          expect(res.body).to.have.own.property("token");
-          expect(res.body).to.have.own.property("refreshToken");
-          done();
-        })
+    describe("When request with admin account",()=>{
+      it("should return token and refresh token and a status 200",(done)=>{
+        request(api)
+          .post('/api/users/login')
+          .send({
+            "username": "user1",
+            "password": "test1"
+          })
+          .expect(200)
+          .end((req,res)=>{
+            expect(res.body).to.have.own.property("token");
+            expect(res.body).to.have.own.property("refreshToken");
+            done();
+          })
+      })
     })
 
-    it("should return token and refresh token and a status 200 with normal account",(done)=>{
-      request(api)
-        .post('/api/users/login')
-        .send({
-          "username": "user2",
-          "password": "test2"
-        })
-        .expect(200)
-        .end((req,res)=>{
-          expect(res.body).to.have.own.property("token");
-          expect(res.body).to.have.own.property("refreshToken");
-          done();
-        })
+    describe("When request with normal account",()=>{
+      it("should return token and refresh token and a status 200",(done)=>{
+        request(api)
+          .post('/api/users/login')
+          .send({
+            "username": "user2",
+            "password": "test2"
+          })
+          .expect(200)
+          .end((req,res)=>{
+            expect(res.body).to.have.own.property("token");
+            expect(res.body).to.have.own.property("refreshToken");
+            done();
+          })
+      })
     })
 
-    it("should return error message and a status 401 with invalid user or password",(done)=>{
-      request(api)
-        .post('/api/users/login')
-        .send({
-          "username": "Wrong",
-          "password": "Wrong"
-        })
-        .expect(401)
-        .end((req,res)=>{
-          expect(res.body.code).to.eq(401);
-          expect(res.body.msg).to.eq("Authentication failed. User not found.");
-          done();
-        })
+    describe("When request with invalid user or password",()=>{
+      it("should return error message and a status 401",(done)=>{
+        request(api)
+          .post('/api/users/login')
+          .send({
+            "username": "Wrong",
+            "password": "Wrong"
+          })
+          .expect(401)
+          .end((req,res)=>{
+            expect(res.body.code).to.eq(401);
+            expect(res.body.msg).to.eq("Authentication failed. User not found.");
+            done();
+          })
+      })
     })
   })
 
   describe("POST /api/users/token",()=>{
-    it("should return new Token and a status 200 with valid refresh token",(done)=>{
-      request(api)
-      .post('/api/users/token')
-      .send({
-        "token": admin_refresh_token
-      })
-      .expect(200)
-      .end((req,res)=>{
-        expect(res.body.success).to.eq(true);
-        done()
+    describe("When request with valid refresh token",()=>{
+      it("should return new Token and a status 200",(done)=>{
+        request(api)
+        .post('/api/users/token')
+        .send({
+          "token": admin_refresh_token
+        })
+        .expect(200)
+        .end((req,res)=>{
+          expect(res.body.success).to.eq(true);
+          done()
+        })
       })
     })
+    
 
-    it("should return error message and a status 403 with invalid refresh token",(done)=>{
-      request(api)
-      .post('/api/users/token')
-      .send({
-        "token": "invalidToken"
-      })
-      .expect(403)
-      .end((req,res)=>{
-        expect(res.body.message).to.eq("Token is invalid!");
-        done()
+    describe("When request with invalid refresh token",()=>{
+      it("should return error message and a status 403",(done)=>{
+        request(api)
+        .post('/api/users/token')
+        .send({
+          "token": "invalidToken"
+        })
+        .expect(403)
+        .end((req,res)=>{
+          expect(res.body.message).to.eq("Token is invalid!");
+          done()
+        })
       })
     })
   })
 
   describe("GET /api/users",()=>{
-    it("should return users and a status 200 with admin token",(done)=>{
-      request(api)
-        .get("/api/users")
-        .set('Authorization', 'bearer ' + admin_token)
-        .expect(200)
-        .end((req,res)=>{
-          for (let user in res.body){
-            if(user.username==="user1") expect(user.role).to.eq("admin")
-          }
-          done()
-        })
+    describe("When request with admin token",()=>{
+      it("should return users and a status 200",(done)=>{
+        request(api)
+          .get("/api/users")
+          .set('Authorization', 'bearer ' + admin_token)
+          .expect(200)
+          .end((req,res)=>{
+            for (let user in res.body){
+              if(user.username==="user1") expect(user.role).to.eq("admin")
+            }
+            done()
+          })
+      })
     })
 
-    it("should return error message and a status 403 with invalid or not admin token",(done)=>{
-      request(api)
-        .get("/api/users")
-        .set('Authorization', 'bearer ' + normal_token)
-        .expect(403)
-        .end((req,res)=>{
-          expect(res.body.message).to.eq("You do not have permission to access");
-          done()
-        })
+    describe("When request with invalid or not admin token",()=>{
+      it("should return error message and a status 403",(done)=>{
+        request(api)
+          .get("/api/users")
+          .set('Authorization', 'bearer ' + normal_token)
+          .expect(403)
+          .end((req,res)=>{
+            expect(res.body.message).to.eq("You do not have permission to access");
+            done()
+          })
+      })
     })
   })  
 
@@ -207,16 +222,18 @@ describe("Users endpoint", () => {
         })
       })
 
-      it("should return error message and a status 401 with movie already in favourites",(done)=>{
-        request(api)
-        .post('/api/users/user1/favourites')
-        .send({
-          "id":movies[0].id
-        })
-        .expect(401)
-        .end((req,res) =>{
-          expect(res.body.msg).to.eq("Already in favourites.");
-          done();
+      describe("When request with movie already in favourites",()=>{
+        it("should return error message and a status 401.",(done)=>{
+          request(api)
+          .post('/api/users/user1/favourites')
+          .send({
+            "id":movies[0].id
+          })
+          .expect(401)
+          .end((req,res) =>{
+            expect(res.body.msg).to.eq("Already in favourites.");
+            done();
+          })
         })
       })
     })

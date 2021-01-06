@@ -48,25 +48,29 @@ describe("topRated endpoint",()=>{
     delete require.cache[require.resolve("../../../../index")];
   });
   describe("GET /api/topRated",()=>{
-    it("should return the right page's 20 top rated movies and a status 200 with valid page number",(done)=>{
-      request(api)
-        .get('/api/topRated')
-        .query({page:1})
-        .expect(200)
-        .end((req,res)=>{
-          expect(res.body.length).to.eq(top.length);
-          done();
-        })
+    describe("When request with valid page number",()=>{
+      it("should return the right page's 20 top rated movies and a status 200",(done)=>{
+        request(api)
+          .get('/api/topRated')
+          .query({page:1})
+          .expect(200)
+          .end((req,res)=>{
+            expect(res.body.length).to.eq(top.length);
+            done();
+          })
+      })
     })
 
-    it("should return the error message and a status 404 with invalid page number",(done)=>{
-      request(api)
-      .get('/api/topRated')
-      .query({page:100})
-      .expect(404)
-      .end((req,res)=>{
-        expect(res.body.message).to.eq("Page number is too long!");
-        done();
+    describe("When request with invalid page number",()=>{
+      it("should return the error message and a status 404",(done)=>{
+        request(api)
+        .get('/api/topRated')
+        .query({page:100})
+        .expect(404)
+        .end((req,res)=>{
+          expect(res.body.message).to.eq("Page number is too long!");
+          done();
+        })
       })
     })
   })
