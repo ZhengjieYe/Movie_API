@@ -35,6 +35,9 @@
     },
     {
       "name": "/api/topRated"
+    },
+    {
+      "name": "/api/popular/actors"
     }
   ],
   "paths": {
@@ -729,6 +732,292 @@
           }
         }
       }
+    },
+    "/api/popular/actors": {
+      "get": {
+        "tags": [
+          "/api/popular/actors"
+        ],
+        "summary": "Get popular actors",
+        "description": "Get popular actors",
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Parameter to detemine how to sort out actors list",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "name",
+                "popularity"
+              ]
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "Parameter to detemine how to filter actors list",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "male",
+                "female"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return popular actors",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_actors_200"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/popular/actors/{actor_id}/known_for_movies": {
+      "get": {
+        "tags": [
+          "/api/popular/actors"
+        ],
+        "summary": "Get actor's famous movies",
+        "description": "Get actor's famous movies",
+        "parameters": [
+          {
+            "name": "actor_id",
+            "in": "path",
+            "description": "Actor's id",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "number",
+              "example": 90633
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return actor's famous movies successfully",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_actor_known_200"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Can not find the actor",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_actor_known_404"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/popular/actors/{actor_id}/review": {
+      "put": {
+        "tags": [
+          "/api/popular/actors"
+        ],
+        "summary": "Change review of one user for a actor",
+        "description": "Change review of one user for a actor",
+        "parameters": [
+          {
+            "name": "actor_id",
+            "in": "path",
+            "description": "Actor's id",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "number",
+              "example": 90633
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/body_6"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return success message and new review",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/put_actor_review_200"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Can not find the review",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/put_actor_review_404"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "/api/popular/actors"
+        ],
+        "summary": "Add new review for a actor",
+        "description": "Add new review for a actor",
+        "parameters": [
+          {
+            "name": "actor_id",
+            "in": "path",
+            "description": "Actor's id",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "number",
+              "example": 90633
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/body_7"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return the actor and reviews",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/post_actor_review_200"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Can not find the actor",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/post_actor_review_404"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/popular/actors/{actor_id}/review/{review_id}": {
+      "delete": {
+        "tags": [
+          "/api/popular/actors"
+        ],
+        "summary": "Delete review of one user for a actor",
+        "description": "Delete review of one user for a actor",
+        "parameters": [
+          {
+            "name": "actor_id",
+            "in": "path",
+            "description": "Actor's id",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "number",
+              "example": 90633
+            }
+          },
+          {
+            "name": "review_id",
+            "in": "path",
+            "description": "Review's id (Get from /api/popular/actors/{actor_id}/reviews)",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "example": "5fef962e7957261ec08245d2"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete successfully",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/delete_actor_review_200"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Delete failed by wrong user",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/delete_actor_review_403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Can not find the review or actor",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/put_actor_review_404"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -934,6 +1223,185 @@
           "poster_path": {
             "type": "string",
             "example": "/tK1zy5BsCt1J4OzoDicXmr0UTFH.jpg"
+          }
+        }
+      },
+      "review": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 90633
+          },
+          "user_id": {
+            "type": "string",
+            "example": "5fef9f743a5c007e846aaf6a"
+          },
+          "content": {
+            "type": "string",
+            "example": "review content."
+          },
+          "date": {
+            "type": "string",
+            "example": "Fri Jan 01 2021 22:47:45 GMT+0000 (Greenwich Mean Time)"
+          }
+        }
+      },
+      "popular_actor": {
+        "type": "object",
+        "properties": {
+          "known_for": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "5fef9f753a5c007e846aafbb"
+            }
+          },
+          "reviews": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "5fefa6913a5c007e846ab033"
+            }
+          },
+          "adult": {
+            "type": "boolean",
+            "example": false
+          },
+          "id": {
+            "type": "number",
+            "example": 90633
+          },
+          "known_for_department": {
+            "type": "string",
+            "example": "Acting"
+          },
+          "name": {
+            "type": "string",
+            "example": "Gal Gadot"
+          },
+          "popularity": {
+            "type": "number",
+            "example": 86.699
+          },
+          "profile_path": {
+            "type": "string",
+            "example": "/fysvehTvU6bE3JgxaOTRfvQJzJ4.jpg"
+          }
+        }
+      },
+      "get_actors_200": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "actors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/popular_actor"
+            }
+          }
+        }
+      },
+      "get_actor_known_200": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "known_for": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/movie"
+            }
+          }
+        }
+      },
+      "get_actor_known_404": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Can not find the actor!"
+          }
+        }
+      },
+      "post_actor_review_200": {
+        "$ref": "#/components/schemas/popular_actor"
+      },
+      "post_actor_review_404": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Can not find the actor!"
+          }
+        }
+      },
+      "put_actor_review_200": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Change review successfully."
+          },
+          "newReview": {
+            "$ref": "#/components/schemas/review"
+          }
+        }
+      },
+      "put_actor_review_404": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Can not find the review!"
+          }
+        }
+      },
+      "delete_actor_review_403": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Delete failed by normal - user2."
+          }
+        }
+      },
+      "delete_actor_review_200": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Delete successfully by admin - user1!"
           }
         }
       },
@@ -1151,6 +1619,29 @@
           "message": {
             "type": "string",
             "example": "Page number is too long!"
+          }
+        }
+      },
+      "body_6": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "example": "review content."
+          },
+          "id": {
+            "type": "string",
+            "description": "Added review's id",
+            "example": "5fef91ec42cab83c04feec06"
+          }
+        }
+      },
+      "body_7": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "example": "review content."
           }
         }
       }

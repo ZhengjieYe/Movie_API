@@ -1,9 +1,12 @@
 import userModel from '../api/users/userModel';
-import { getMovies, getGenres, getUpcomingMovies, getTopRated } from '../api/tmdb-api'
+import { getMovies, getGenres, getUpcomingMovies, getTopRated, getPopularActor } from '../api/tmdb-api'
 import movieModel from '../api/movies/movieModel';
 import genresModel from '../api/genres/genresModel';
 import upcomingModel from '../api/upcoming/upcomingModel';
 import topRatedModel from '../api/topRated/topRatedModel';
+import knowForModel from '../api/popular/actor/knownForMovie';
+import popularActorModel from '../api/popular/actor/popularActor';
+import reviewModel from '../api/popular/actor/review';
 
 const users = [
   {
@@ -88,3 +91,30 @@ export async function loadUsers() {
     }
   }
   
+
+  export async function loadPopularActor(){
+    console.log("load popular actors");
+
+    try{
+      let actors = await getPopularActor();
+      await knowForModel.deleteMany();
+      await popularActorModel.deleteMany();
+      await reviewModel.deleteMany();
+      const newActors = await Promise.all(actors.map(async (actor)=>{
+        let known_for = actor.known_for;
+        const known_for_id=await Promise.all(known_for.map(async (k)=>{
+          await knowForModel.collection.insertOne(k,(err,doc)=>{});
+          const know_forMovie=await knowForModel.findByMovieId(k.id);
+          if(know_forMovie) return know_forMovie._id;
+        }));
+        return {
+          ...actor,
+          known_for: known_for_id
+        }
+      }));
+      await popularActorModel.collection.insertMany(newActors);
+      console.log(`${newActors.length} popular actors were successfully stored.`);
+    }catch(err){
+      console.log(`failed to Load popular actors Data: ${err}`);
+    }
+  }

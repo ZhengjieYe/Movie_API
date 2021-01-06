@@ -1,13 +1,31 @@
 import chai from "chai";
 import request from "supertest";
 import {getTopRated} from '../../../../api/tmdb-api'
+const mongoose = require("mongoose");
 
 const expect = chai.expect;
 let api;
 let top;
-
+let db;
 
 describe("topRated endpoint",()=>{
+  before(() => {
+    mongoose.connect(String(process.env.mongoDB), {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    db = mongoose.connection;
+    console.log('connect to db for testing.');
+  });
+
+  after(async () => {
+    try {
+      await db.close();
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
   beforeEach(function (done) {
     try {
       api = require("../../../../index");
@@ -22,7 +40,7 @@ describe("topRated endpoint",()=>{
         top=res;
         done()
       })
-    },4000)
+    },7000)
   });
   
   afterEach(() => {
@@ -30,25 +48,29 @@ describe("topRated endpoint",()=>{
     delete require.cache[require.resolve("../../../../index")];
   });
   describe("GET /api/topRated",()=>{
-    it("should return the right page's 20 top rated movies and a status 200 with valid page number",(done)=>{
-      request(api)
-        .get('/api/topRated')
-        .query({page:1})
-        .expect(200)
-        .end((req,res)=>{
-          expect(res.body.length).to.eq(top.length);
-          done();
-        })
+    describe("When request with valid page number",()=>{
+      it("should return the right page's 20 top rated movies and a status 200",(done)=>{
+        request(api)
+          .get('/api/topRated')
+          .query({page:1})
+          .expect(200)
+          .end((req,res)=>{
+            expect(res.body.length).to.eq(top.length);
+            done();
+          })
+      })
     })
 
-    it("should return the error message and a status 404 with invalid page number",(done)=>{
-      request(api)
-      .get('/api/topRated')
-      .query({page:100})
-      .expect(404)
-      .end((req,res)=>{
-        expect(res.body.message).to.eq("Page number is too long!");
-        done();
+    describe("When request with invalid page number",()=>{
+      it("should return the error message and a status 404",(done)=>{
+        request(api)
+        .get('/api/topRated')
+        .query({page:100})
+        .expect(404)
+        .end((req,res)=>{
+          expect(res.body.message).to.eq("Page number is too long!");
+          done();
+        })
       })
     })
   })

@@ -47,49 +47,57 @@ describe("Movies endpoint", () => {
   });
   
   describe("GET /api/movies", ()=>{
-    it("should return 20 movies and a status 200 with Bearer token",(done)=>{
-      request(api)
-      .get('/api/movies')
-      .set('Authorization', 'bearer ' + token)
-      .expect(200)
-      .end((req,res)=>{
-        expect(res.body).to.be.a("array");
-        expect(res.body.length).to.eq(20);
-        done()
-      })
-    })
-
-    it("should return Unauthorized and a status 401 without Bearer token", (done)=>{
-      request(api)
+    describe("When request with Bearer token",()=>{
+      it("should return 20 movies and a status 200",(done)=>{
+        request(api)
         .get('/api/movies')
-        .expect(401)
+        .set('Authorization', 'bearer ' + token)
+        .expect(200)
         .end((req,res)=>{
-          expect(res.text).to.eq("Unauthorized");
+          expect(res.body).to.be.a("array");
+          expect(res.body.length).to.eq(20);
           done()
         })
+      })
     })
+    describe("When request without Bearer token",()=>{
+      it("should return Unauthorized and a status 401", (done)=>{
+        request(api)
+          .get('/api/movies')
+          .expect(401)
+          .end((req,res)=>{
+            expect(res.text).to.eq("Unauthorized");
+            done()
+          })
+      })
+    })
+    
   })
 
   describe("GET /api/movies/{id}",()=>{
-    it("should return right movie and a status 200 with a valid ID", (done)=>{
-      request(api)
-        .get(`/api/movies/${movie.id}`)
-        .set('Authorization', 'bearer ' + token)
-        .expect(200)
-        .end((req, res)=>{
-          expect(res.body.title).to.eq(movie.title)
-          done()
-        })
+    describe("When request with a valid ID",()=>{
+      it("should return right movie and a status 200", (done)=>{
+        request(api)
+          .get(`/api/movies/${movie.id}`)
+          .set('Authorization', 'bearer ' + token)
+          .expect(200)
+          .end((req, res)=>{
+            expect(res.body.title).to.eq(movie.title)
+            done()
+          })
+      })
     })
 
-    it("should return error and a status 500 with a invalid ID", (done)=>{
-      request(api)
-        .get(`/api/movies/ddd`)
-        .set('Authorization', 'bearer ' + token)
-        .expect(500)
-        .end((req, res)=>{
-          done()
-        })
+    describe("When request with a invalid ID",()=>{
+      it("should return error and a status 500", (done)=>{
+        request(api)
+          .get(`/api/movies/ddd`)
+          .set('Authorization', 'bearer ' + token)
+          .expect(500)
+          .end((req, res)=>{
+            done()
+          })
+      })
     })
   })
 
