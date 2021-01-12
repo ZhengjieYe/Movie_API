@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 
 const MovieSchema = new Schema({
   adult: { type: Boolean },
+  credits: {type: Array },
   id: { type: Number, required: true, unique: true },
   poster_path: { type: String },
   overview: { type: String },

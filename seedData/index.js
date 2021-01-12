@@ -1,5 +1,5 @@
 import userModel from '../api/users/userModel';
-import { getMovies, getGenres, getUpcomingMovies, getTopRated, getPopularActor } from '../api/tmdb-api'
+import { getMovies, getGenres, getUpcomingMovies, getTopRated, getPopularActor, getCast } from '../api/tmdb-api'
 import movieModel from '../api/movies/movieModel';
 import genresModel from '../api/genres/genresModel';
 import upcomingModel from '../api/upcoming/upcomingModel';
@@ -35,9 +35,16 @@ export async function loadUsers() {
   export async function loadMovies() {
     console.log('load movies Data');
     getMovies().then(async res=>{
+      const addedCastList=await Promise.all(
+        res.map(async (movie)=>{
+          const cast=await getCast(movie.id);
+          const castId=cast.map(c=>c.id);
+         return {...movie, credits:castId};
+        })
+      );
       try {
         await movieModel.deleteMany();
-        await movieModel.collection.insertMany(res);
+        await movieModel.collection.insertMany(addedCastList);
         console.info(`${res.length} Movies were successfully stored.`);
       } catch (err) {
         console.error(`failed to Load movie Data: ${err}`);
@@ -53,7 +60,7 @@ export async function loadUsers() {
         await genresModel.collection.insertMany(res);
         console.info(`${res.length} genres were successfully stored.`);
       } catch (err) {
-        console.error(`failed to Load movie Data: ${err}`);
+        console.error(`failed to load genres Data: ${err}`);
       }
     })
   }
@@ -67,7 +74,7 @@ export async function loadUsers() {
         await upcomingModel.collection.insertMany(res);
         console.info(`${res.length} upcoming movies were successfully stored.`);
       } catch (err) {
-        console.error(`failed to Load movie Data: ${err}`);
+        console.error(`failed to load upcoming movie Data: ${err}`);
       }
     })
   }
@@ -87,7 +94,7 @@ export async function loadUsers() {
       await topRatedModel.collection.insertMany(top4);
       console.info(`${top1.length+top2.length+top3.length+top4.length} top rated movies were successfully stored.`);
     } catch (err) {
-      console.error(`failed to Load movie Data: ${err}`);
+      console.error(`failed to load top rated movie Data: ${err}`);
     }
   }
   
