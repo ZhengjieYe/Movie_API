@@ -17,8 +17,8 @@ const UserSchema = new Schema({
     }
   },
   favourites: [{type: mongoose.Schema.Types.ObjectId, ref: 'Movies'}],
-  watchlist: [{type: mongoose.Schema.Types.ObjectId, ref: 'Upcoming'}]
-
+  watchlist: [{type: mongoose.Schema.Types.ObjectId, ref: 'Upcoming'}],
+  ratedMovies: [{type: mongoose.Schema.Types.ObjectId, ref: 'Rate'}]
 });
 
 UserSchema.statics.findByUserName = function (username) {

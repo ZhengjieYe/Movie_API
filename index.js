@@ -10,6 +10,7 @@ import upcomingRouter from './api/upcoming';
 import topRatedRouter from './api/topRated';
 import popularActorRouter from './api/popular/actor';
 import recommandRouter from './api/recommend';
+import rateRouter from './api/rate';
 
 const optimizelyExpress = require('@optimizely/express');
 // import swaggerJsdoc from "swagger-jsdoc"
@@ -87,7 +88,8 @@ app.use('/api/genres', optimizelyController('movie_api_genres'), genresRouter);
 app.use('/api/upcoming', optimizelyController('movie_api_upcoming'), upcomingRouter);
 app.use('/api/topRated', optimizelyController('movie_api_top'), topRatedRouter);
 app.use('/api/popular/actors', optimizelyController('movie_api_popularactor'), popularActorRouter);
-app.use('/api/recommend',authenticateJWT,recommandRouter);
+app.use('/api/recommend', optimizelyController('movie_api_recommend'), authenticateJWT,recommandRouter);
+app.use('/api/rate', optimizelyController('movie_api_rate'), authenticateJWT, rateRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
