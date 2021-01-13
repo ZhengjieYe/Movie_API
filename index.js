@@ -11,6 +11,7 @@ import topRatedRouter from './api/topRated';
 import popularActorRouter from './api/popular/actor';
 import recommandRouter from './api/recommend';
 import rateRouter from './api/rate';
+import playingRouter from './api/playing';
 
 const optimizelyExpress = require('@optimizely/express');
 // import swaggerJsdoc from "swagger-jsdoc"
@@ -26,7 +27,7 @@ import {getIsEnabled} from './middleware/optimizely/getIsEnabled'
 import {optimizelyController} from './middleware/optimizely/optimizelyController'
 import {authenticateJWT} from './middleware/authenticate/authenticateJWT'
 
-import {loadUsers, loadMovies, loadGenres, loadUpcomingMovies, loadTopRatedMovies, loadPopularActor} from './seedData';
+import {loadUsers, loadMovies, loadGenres, loadUpcomingMovies, loadTopRatedMovies, loadPopularActor,loadPlaying} from './seedData';
 if (process.env.SEED_DB) {
   loadUsers();
   loadMovies();
@@ -34,6 +35,7 @@ if (process.env.SEED_DB) {
   loadUpcomingMovies();
   loadTopRatedMovies();
   loadPopularActor();
+  loadPlaying();
 }
 
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'app.log'), { flags: 'a' })
@@ -90,7 +92,7 @@ app.use('/api/topRated', optimizelyController('movie_api_top'), topRatedRouter);
 app.use('/api/popular/actors', optimizelyController('movie_api_popularactor'), popularActorRouter);
 app.use('/api/recommend', optimizelyController('movie_api_recommend'), authenticateJWT,recommandRouter);
 app.use('/api/rate', optimizelyController('movie_api_rate'), authenticateJWT, rateRouter);
-
+app.use('/api/playing',optimizelyController('movie_api_playing'),playingRouter)
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });

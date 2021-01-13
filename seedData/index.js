@@ -1,5 +1,5 @@
 import userModel from '../api/users/userModel';
-import { getMovies, getGenres, getUpcomingMovies, getTopRated, getPopularActor, getCast } from '../api/tmdb-api'
+import { getMovies, getGenres, getUpcomingMovies, getTopRated, getPopularActor, getCast,getNowPlaying } from '../api/tmdb-api'
 import movieModel from '../api/movies/movieModel';
 import genresModel from '../api/genres/genresModel';
 import upcomingModel from '../api/upcoming/upcomingModel';
@@ -8,6 +8,7 @@ import knowForModel from '../api/popular/actor/knownForMovie';
 import popularActorModel from '../api/popular/actor/popularActor';
 import reviewModel from '../api/popular/actor/review';
 import rateModel from '../api/rate/rateModel';
+import playingModel from '../api/playing/playingModel';
 
 const users = [
   {
@@ -127,3 +128,17 @@ export async function loadUsers() {
       console.log(`failed to Load popular actors Data: ${err}`);
     }
   }
+
+  export async function loadPlaying() {
+    console.log('load now playing movie Data');
+    getNowPlaying().then(async res=>{
+      try {
+        await playingModel.deleteMany();
+        await playingModel.collection.insertMany(res);
+        console.info(`${res.length} now playing movies were successfully stored.`);
+      } catch (err) {
+        console.error(`failed to load now playing movie Data: ${err}`);
+      }
+    })
+  }
+  

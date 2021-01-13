@@ -44,6 +44,9 @@
     },
     {
       "name": "/api/rate"
+    },
+    {
+      "name": "/api/playing"
     }
   ],
   "paths": {
@@ -1225,6 +1228,32 @@
           }
         ]
       }
+    },
+    "/api/playing": {
+      "get": {
+        "tags": [
+          "/api/playing"
+        ],
+        "summary": "Get now playing movies",
+        "description": "Get now playing movies",
+        "responses": {
+          "200": {
+            "description": "Return now playing movies",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_playing_200"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -1778,6 +1807,21 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/popular_actor"
+            }
+          }
+        }
+      },
+      "get_playing_200": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "playingMovies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/rate_movie"
             }
           }
         }
