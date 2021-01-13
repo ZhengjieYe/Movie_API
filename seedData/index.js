@@ -7,6 +7,7 @@ import topRatedModel from '../api/topRated/topRatedModel';
 import knowForModel from '../api/popular/actor/knownForMovie';
 import popularActorModel from '../api/popular/actor/popularActor';
 import reviewModel from '../api/popular/actor/review';
+import rateModel from '../api/rate/rateModel';
 
 const users = [
   {
@@ -44,6 +45,7 @@ export async function loadUsers() {
       );
       try {
         await movieModel.deleteMany();
+        await rateModel.deleteMany();
         await movieModel.collection.insertMany(addedCastList);
         console.info(`${res.length} Movies were successfully stored.`);
       } catch (err) {

@@ -41,6 +41,9 @@
     },
     {
       "name": "/api/recommend"
+    },
+    {
+      "name": "/api/rate"
     }
   ],
   "paths": {
@@ -1113,6 +1116,115 @@
           }
         ]
       }
+    },
+    "/api/rate": {
+      "get": {
+        "tags": [
+          "/api/rate"
+        ],
+        "summary": "Get user's rated movies",
+        "description": "Get user's rated movies",
+        "responses": {
+          "200": {
+            "description": "Return user's rated movies",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_rate_200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Lack of token",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/lack_token"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid token",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/invalid_token"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "/api/rate"
+        ],
+        "summary": "Rate or update a movie with specific user",
+        "description": "Rate or update a movie with specific user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/body_8"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Rate successful",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/post_rate_200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Lack of token",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/lack_token"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid token",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/invalid_token"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Movie not find",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/post_rate_404"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -1302,6 +1414,69 @@
       "movie": {
         "type": "object",
         "properties": {
+          "credits": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "example": 90633
+            }
+          },
+          "genre_ids": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "example": 12
+            }
+          },
+          "_id": {
+            "type": "string",
+            "example": "5fe8782e5d2f55121c249515"
+          },
+          "adult": {
+            "type": "boolean",
+            "example": true
+          },
+          "backdrop_path": {
+            "type": "string",
+            "example": "/cjaOSjsjV6cl3uXdJqimktT880L.jpg"
+          },
+          "id": {
+            "type": "number",
+            "example": 529203
+          },
+          "original_title": {
+            "type": "string",
+            "example": "The Croods: A New Ag"
+          },
+          "overview": {
+            "type": "string",
+            "example": "After leaving their cave, the Croods encounter their biggest threat since leaving: anot..."
+          },
+          "popularity": {
+            "type": "number",
+            "example": 2894.092
+          },
+          "release_date": {
+            "type": "string",
+            "example": "/2020-11-25"
+          },
+          "title": {
+            "type": "string",
+            "example": "The Croods: A New Age"
+          },
+          "poster_path": {
+            "type": "string",
+            "example": "/tK1zy5BsCt1J4OzoDicXmr0UTFH.jpg"
+          }
+        }
+      },
+      "rate_movie": {
+        "type": "object",
+        "properties": {
+          "rating": {
+            "type": "number",
+            "example": 10
+          },
           "credits": {
             "type": "array",
             "items": {
@@ -1552,6 +1727,46 @@
           }
         }
       },
+      "get_rate_200": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "recommendMovies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/rate_movie"
+            }
+          }
+        }
+      },
+      "post_rate_200": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "rate": {
+            "$ref": "#/components/schemas/post_rate_200_rate"
+          }
+        }
+      },
+      "post_rate_404": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Movie not found!"
+          }
+        }
+      },
       "get_recommend_actors_200": {
         "type": "object",
         "properties": {
@@ -1791,6 +2006,36 @@
           "content": {
             "type": "string",
             "example": "review content."
+          }
+        }
+      },
+      "body_8": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "movie id."
+          },
+          "rating": {
+            "type": "number",
+            "example": 10
+          }
+        }
+      },
+      "post_rate_200_rate": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "user1"
+          },
+          "movie_id": {
+            "type": "number",
+            "example": 508442
+          },
+          "rating": {
+            "type": "number",
+            "example": 10
           }
         }
       }
