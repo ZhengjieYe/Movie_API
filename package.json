@@ -12,6 +12,7 @@
     "compile:genres": "babel ./api/genres --out-dir build/api/genres",
     "compile:upcoming": "babel ./api/upcoming --out-dir build/api/upcoming",
     "compile:topRated": "babel ./api/topRated --out-dir build/api/topRated",
+    "compile:recommend": "babel ./api/recommend --out-dir build/api/recommend",
     "compile:actors": "babel ./api/popular --out-dir build/api/popular",
     "compile:tmdb": "babel ./api/tmdb-api.js --out-dir build/api/",
     "compile:middleware": "babel ./middleware --out-dir build/middleware",
@@ -19,7 +20,7 @@
     "compile:data": "babel ./seedData --out-dir build/seedData",
     "compile:authenticate": "babel authenticate.js --out-dir build/",
     "compile:copy": "cp -r ./node_modules/ build/node_modules && cp -r ./public build/public",
-    "compile:all": "npm-run-all compile:app compile:actors compile:topRated compile:upcoming compile:genres compile:movies compile:users compile:tmdb compile:middleware compile:db compile:data compile:authenticate compile:copy",
+    "compile:all": "npm-run-all compile:app compile:recommend compile:actors compile:topRated compile:upcoming compile:genres compile:movies compile:users compile:tmdb compile:middleware compile:db compile:data compile:authenticate compile:copy",
     "build": "npm-run-all clean compile:all",
     "serve": "node ./build/index.js",
     "test": "cross-env NODE_ENV=test mocha --timeout 10000"

@@ -38,6 +38,9 @@
     },
     {
       "name": "/api/popular/actors"
+    },
+    {
+      "name": "/api/recommend"
     }
   ],
   "paths": {
@@ -64,7 +67,7 @@
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/inline_response_403"
+                  "$ref": "#/components/schemas/invalid_token"
                 }
               }
             }
@@ -241,7 +244,7 @@
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/inline_response_403_1"
+                  "$ref": "#/components/schemas/inline_response_403"
                 }
               }
             }
@@ -512,7 +515,7 @@
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/inline_response_401"
+                  "$ref": "#/components/schemas/lack_token"
                 }
               }
             }
@@ -555,7 +558,7 @@
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/inline_response_403_2"
+                  "$ref": "#/components/schemas/inline_response_403_1"
                 }
               }
             }
@@ -611,7 +614,7 @@
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/inline_response_401_1"
+                  "$ref": "#/components/schemas/inline_response_401"
                 }
               }
             }
@@ -666,7 +669,7 @@
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/inline_response_401"
+                  "$ref": "#/components/schemas/inline_response_401_1"
                 }
               }
             }
@@ -676,7 +679,7 @@
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/inline_response_403_3"
+                  "$ref": "#/components/schemas/inline_response_403_2"
                 }
               }
             }
@@ -1018,10 +1021,128 @@
           }
         ]
       }
+    },
+    "/api/recommend/movies": {
+      "get": {
+        "tags": [
+          "/api/recommend"
+        ],
+        "summary": "Get recommend movies according to user's favourite movies.",
+        "description": "Get recommend movies according to user's favourite movies.",
+        "responses": {
+          "200": {
+            "description": "Return recommend movies",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_recommend_movies_200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Lack of token",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/lack_token"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid token",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/invalid_token"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/recommend/actors": {
+      "get": {
+        "tags": [
+          "/api/recommend"
+        ],
+        "summary": "Get recommend actors according to user's favourite movies.",
+        "description": "Get recommend actors according to user's favourite movies.",
+        "responses": {
+          "200": {
+            "description": "Return recommend actors",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_recommend_actors_200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Lack of token",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/lack_token"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid token",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/invalid_token"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
     "schemas": {
+      "lack_token": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "fail"
+          },
+          "message": {
+            "type": "string",
+            "example": "Lack of Token"
+          }
+        }
+      },
+      "invalid_token": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "fail"
+          },
+          "message": {
+            "type": "string",
+            "example": "Invalid Token"
+          }
+        }
+      },
       "get_user_200": {
         "type": "object",
         "properties": {
@@ -1152,6 +1273,10 @@
           "password": {
             "type": "string",
             "example": "$2a$10$zaYvNydcuAQ9vgiA1zY7S.oeB3/0qp5gWoAJ0ceVCZan/nMzF0Qw."
+          },
+          "role": {
+            "type": "string",
+            "example": "admin"
           }
         }
       },
@@ -1177,6 +1302,13 @@
       "movie": {
         "type": "object",
         "properties": {
+          "credits": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "example": 90633
+            }
+          },
           "genre_ids": {
             "type": "array",
             "items": {
@@ -1405,16 +1537,33 @@
           }
         }
       },
-      "inline_response_403": {
+      "get_recommend_movies_200": {
         "type": "object",
         "properties": {
-          "status": {
-            "type": "string",
-            "example": "fail"
+          "success": {
+            "type": "boolean",
+            "example": true
           },
-          "message": {
-            "type": "string",
-            "example": "Invalid Token"
+          "recommendMovies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/movie"
+            }
+          }
+        }
+      },
+      "get_recommend_actors_200": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "recommendActors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/popular_actor"
+            }
           }
         }
       },
@@ -1458,7 +1607,7 @@
           }
         }
       },
-      "inline_response_403_1": {
+      "inline_response_403": {
         "type": "object",
         "properties": {
           "success": {
@@ -1500,19 +1649,6 @@
           }
         }
       },
-      "inline_response_401": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "example": "fail"
-          },
-          "message": {
-            "type": "string",
-            "example": "Lack of Token"
-          }
-        }
-      },
       "body_4": {
         "type": "object",
         "properties": {
@@ -1522,7 +1658,7 @@
           }
         }
       },
-      "inline_response_403_2": {
+      "inline_response_403_1": {
         "type": "object",
         "properties": {
           "code": {
@@ -1550,7 +1686,7 @@
           }
         }
       },
-      "inline_response_401_1": {
+      "inline_response_401": {
         "type": "object",
         "properties": {
           "success": {
@@ -1596,7 +1732,20 @@
           }
         }
       },
-      "inline_response_403_3": {
+      "inline_response_401_1": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "fail"
+          },
+          "message": {
+            "type": "string",
+            "example": "Lack of Token"
+          }
+        }
+      },
+      "inline_response_403_2": {
         "type": "object",
         "properties": {
           "success": {

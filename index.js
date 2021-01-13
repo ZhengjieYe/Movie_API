@@ -9,6 +9,7 @@ import genresRouter from './api/genres';
 import upcomingRouter from './api/upcoming';
 import topRatedRouter from './api/topRated';
 import popularActorRouter from './api/popular/actor';
+import recommandRouter from './api/recommend';
 
 const optimizelyExpress = require('@optimizely/express');
 // import swaggerJsdoc from "swagger-jsdoc"
@@ -22,6 +23,7 @@ import passport from './authenticate';
 // import helmet from 'helmet'
 import {getIsEnabled} from './middleware/optimizely/getIsEnabled'
 import {optimizelyController} from './middleware/optimizely/optimizelyController'
+import {authenticateJWT} from './middleware/authenticate/authenticateJWT'
 
 import {loadUsers, loadMovies, loadGenres, loadUpcomingMovies, loadTopRatedMovies, loadPopularActor} from './seedData';
 if (process.env.SEED_DB) {
@@ -33,22 +35,15 @@ if (process.env.SEED_DB) {
   loadPopularActor();
 }
 
-
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'app.log'), { flags: 'a' })
-
 dotenv.config();
 process.on('uncaughtException', err => {
   console.log(chalk.red(err.name, err.message));
   console.log(chalk.yellow('UNCAUGHT EXCEPTION! 💥 Shutting down...'));
-
   process.exit(1);
-
 });
-
 const app = express();
-
 const port = process.env.PORT;
-
 const optimizely = optimizelyExpress.initialize({
   sdkKey: process.env.OPTIMIZELY,
   datafileOptions: {
@@ -57,7 +52,6 @@ const optimizely = optimizelyExpress.initialize({
   },
   logLevel: 'info',        // Controls console logging. Can be 'debug', 'info', 'warn', or 'error'
 });
-
 app.use(optimizely.middleware);
 
 // app.use(helmet());
@@ -65,18 +59,15 @@ app.use(optimizely.middleware);
 //configure body-parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
-
 app.use(morgan('combined', {
   interval: '7d',
   stream: accessLogStream
 }));
-
 app.get('/', function(req, res, next) {
   const isEnabled = getIsEnabled(req, 'movie_app_ca2','yzj',20091571);
 
   res.status(200).send('Optimizely Express Example: ' +  (isEnabled ? 'You got the hello world feature!' : 'Feature off.'))
 });
-
 
 // options deleted by YZJ 20091571
 // const specs = swaggerJsdoc(options);
@@ -88,17 +79,15 @@ app.get('/', function(req, res, next) {
 // );
 const swaggerDocument = require('./public/api-docs.json');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explorer: true }));
-
-
-
 app.use(passport.initialize());
 
-app.use('/api/movies', optimizelyController('movie_api_movies'), passport.authenticate('jwt', {session: false}), movieRouter);
+app.use('/api/movies', optimizelyController('movie_api_movies'),passport.authenticate('jwt', {session: false}), movieRouter);
 app.use('/api/users', optimizelyController('movie_api_users'), usersRouter);
 app.use('/api/genres', optimizelyController('movie_api_genres'), genresRouter);
 app.use('/api/upcoming', optimizelyController('movie_api_upcoming'), upcomingRouter);
 app.use('/api/topRated', optimizelyController('movie_api_top'), topRatedRouter);
 app.use('/api/popular/actors', optimizelyController('movie_api_popularactor'), popularActorRouter);
+app.use('/api/recommend',authenticateJWT,recommandRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
