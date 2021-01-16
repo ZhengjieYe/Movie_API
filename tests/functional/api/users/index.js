@@ -179,14 +179,15 @@ describe("Users endpoint", () => {
     })
   })  
 
-  describe("/api/users/:username/favourites endpoint",()=>{
+  describe("/api/users/favourites endpoint",()=>{
     let movies;
 
     beforeEach((done)=>{
       getMovies().then((res)=>{
         movies=res;
         request(api)
-        .post('/api/users/user1/favourites')
+        .post('/api/users/favourites')
+        .set('Authorization', 'bearer ' + admin_token)
         .send({
           "id":movies[0].id
         })
@@ -195,10 +196,11 @@ describe("Users endpoint", () => {
       })
     })
 
-    describe("GET /api/users/:username/favourites",()=>{
+    describe("GET /api/users/favourites",()=>{
       it("should return the added movies list and a status 200",(done)=>{
         request(api)
-          .get('/api/users/user1/favourites')
+          .get('/api/users/favourites')
+          .set('Authorization', 'bearer ' + admin_token)
           .expect(200)
           .end((req,res)=>{
             expect(res.body[0].id).to.eq(movies[0].id);
@@ -208,10 +210,11 @@ describe("Users endpoint", () => {
       })
     })
 
-    describe("POST /api/users/:username/favourites",()=>{
+    describe("POST /api/users/favourites",()=>{
       it("should return the added movie and a status 200",(done)=>{
         request(api)
-        .post('/api/users/user1/favourites')
+        .post('/api/users/favourites')
+        .set('Authorization', 'bearer ' + admin_token)
         .send({
           "id":movies[1].id
         })
@@ -225,7 +228,8 @@ describe("Users endpoint", () => {
       describe("When request with movie already in favourites",()=>{
         it("should return error message and a status 401.",(done)=>{
           request(api)
-          .post('/api/users/user1/favourites')
+          .post('/api/users/favourites')
+          .set('Authorization', 'bearer ' + admin_token)
           .send({
             "id":movies[0].id
           })
