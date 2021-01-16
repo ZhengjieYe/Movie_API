@@ -48,7 +48,7 @@ describe("Recommend endpoint", () => {
         token=res.body.token.split(" ")[1];
 
         request(api)
-          .post("/api/users/user2/favourites")
+          .post("/api/users/favourites")
           .send({
             "id":"529203"
           })
@@ -85,7 +85,7 @@ describe("Recommend endpoint", () => {
         recommendMovies=res.body.recommendMovies;
 
         request(api)
-          .post("/api/users/user2/favourites")
+          .post("/api/users/favourites")
           .send({
             "id":"737568"
           })
@@ -163,7 +163,7 @@ describe("Recommend endpoint", () => {
         recommendActors=res.body.recommendActors;
 
         request(api)
-          .post("/api/users/user2/favourites")
+          .post("/api/users/favourites")
           .send({
             "id":"737568"
           })
