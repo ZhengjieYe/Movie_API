@@ -258,26 +258,13 @@
         }
       }
     },
-    "/api/users/{username}/favourites": {
+    "/api/users/favourites": {
       "get": {
         "tags": [
           "/api/users"
         ],
         "summary": "get users favourites list",
         "description": "get users favourites list",
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "description": "username",
-            "required": true,
-            "style": "simple",
-            "explode": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "return users favourites list",
@@ -289,7 +276,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -297,24 +289,11 @@
         ],
         "summary": "Add to users favourites list",
         "description": "Add to users favourites list",
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "description": "username",
-            "required": true,
-            "style": "simple",
-            "explode": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/post_favourites_201"
+                "$ref": "#/components/schemas/body_4"
               }
             }
           }
@@ -325,7 +304,7 @@
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/movies"
+                  "$ref": "#/components/schemas/post_favourites_201"
                 }
               }
             }
@@ -340,7 +319,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/movies": {
@@ -543,7 +527,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/body_4"
+                "$ref": "#/components/schemas/body_5"
               }
             }
           }
@@ -588,7 +572,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/body_5"
+                "$ref": "#/components/schemas/body_6"
               },
               "examples": {
                 "0": {
@@ -865,7 +849,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/body_6"
+                "$ref": "#/components/schemas/body_7"
               }
             }
           }
@@ -922,7 +906,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/body_7"
+                "$ref": "#/components/schemas/body_8"
               }
             }
           }
@@ -1175,7 +1159,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/body_8"
+                "$ref": "#/components/schemas/body_9"
               }
             }
           }
@@ -1879,6 +1863,15 @@
           }
         }
       },
+      "body_4": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "464052"
+          }
+        }
+      },
       "inline_response_200": {
         "type": "object",
         "properties": {
@@ -1908,7 +1901,7 @@
           }
         }
       },
-      "body_4": {
+      "body_5": {
         "type": "object",
         "properties": {
           "id": {
@@ -1934,7 +1927,7 @@
           }
         }
       },
-      "body_5": {
+      "body_6": {
         "type": "object",
         "properties": {
           "username": {
@@ -2030,7 +2023,7 @@
           }
         }
       },
-      "body_6": {
+      "body_7": {
         "type": "object",
         "properties": {
           "content": {
@@ -2044,7 +2037,7 @@
           }
         }
       },
-      "body_7": {
+      "body_8": {
         "type": "object",
         "properties": {
           "content": {
@@ -2053,7 +2046,7 @@
           }
         }
       },
-      "body_8": {
+      "body_9": {
         "type": "object",
         "properties": {
           "id": {
