@@ -84,7 +84,7 @@ const swaggerDocument = require('./public/api-docs.json');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explorer: true }));
 app.use(passport.initialize());
 
-app.use('/api/movies', optimizelyController('movie_api_movies'),passport.authenticate('jwt', {session: false}), movieRouter);
+app.use('/api/movies', optimizelyController('movie_api_movies'), movieRouter);
 app.use('/api/users', optimizelyController('movie_api_users'), usersRouter);
 app.use('/api/genres', optimizelyController('movie_api_genres'), genresRouter);
 app.use('/api/upcoming', optimizelyController('movie_api_upcoming'), upcomingRouter);
