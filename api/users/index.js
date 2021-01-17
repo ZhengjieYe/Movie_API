@@ -49,9 +49,9 @@ router.post('/login', async (req, res, next) => {
     user.comparePassword(req.body.password, (err, isMatch) => {
       if (isMatch && !err) {
         // if user is found and password is right create a token
-        const token = jwt.sign({username:user.username, role:user.role}, process.env.SECRET);
+        const token = jwt.sign({username:user.username, role:user.role}, process.env.SECRET, { expiresIn: '20m' });
 
-        const refreshToken = jwt.sign({ username: user.username, role: user.role }, process.env.REFRESH_SECRET);
+        const refreshToken = jwt.sign({ username: user.username, role: user.role }, process.env.REFRESH_SECRET,  { expiresIn: '20m' });
 
         refreshTokens.push(refreshToken);
         // return the information including token as JSON
