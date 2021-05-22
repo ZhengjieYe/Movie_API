@@ -1,4 +1,4 @@
-# Assignment 2 - Web API.
+# Web API.
 
 Name: Zhengjie Ye
 
